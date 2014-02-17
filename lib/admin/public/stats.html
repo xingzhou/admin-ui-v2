@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+
+        <title>Statistics</title>
+
+        <link rel="stylesheet" type="text/css" href="css/stats.css"/>
+
+        <script src="js/external/jquery/jquery-1.9.1.js"></script>
+        <script src="js/external/jquery/jquery.base64.js"></script>
+
+        <link rel="stylesheet" type="text/css" href="js/external/jquery/DataTables-1.9.4/media/css/jquery.dataTables.css"/>
+        <link rel="stylesheet" type="text/css" href="js/external/jquery/TableTools-2.1.5/media/css/TableTools.css"/>
+
+        <link rel="stylesheet" type="text/css" href="css/table.css"/>
+
+        <script src="js/external/jquery/DataTables-1.9.4/media/js/jquery.dataTables.min.js"></script>
+        <script src="js/external/jquery/TableTools-2.1.5/media/js/TableTools.min.js"></script>
+
+        <script src="js/app/constants.js"></script>
+        <script src="js/app/utilities.js"></script>
+        <script src="js/app/format.js"></script>
+        <script src="js/app/table.js"></script>
+        <script src="js/app/stats.js"></script>
+        <script src="js/app/adminStats.js"></script>
+
+        <script src="js/external/jqplot/jquery.jqplot.js"></script>          
+        <script src="js/external/jqplot/plugins/jqplot.canvasTextRenderer.min.js"></script>
+        <script src="js/external/jqplot/plugins/jqplot.canvasAxisTickRenderer.min.js"></script>
+        <script src="js/external/jqplot/plugins/jqplot.canvasAxisLabelRenderer.min.js"></script>
+        <script src="js/external/jqplot/plugins/jqplot.enhancedLegendRenderer.min.js"></script>
+        <script src="js/external/jqplot/plugins/jqplot.highlighter.min.js"></script>
+        <script src="js/external/jqplot/plugins/jqplot.dateAxisRenderer.min.js"></script>
+        
+        <link rel="stylesheet" type="text/css" href="js/external/jqplot/jquery.jqplot.css"/>
+
+    </head>
+
+    <body style="visibility: hidden;">
+
+        <div class="banner">
+          <div class="bannerText">
+            <span class="bannerTitle">
+              Cloud Foundry Statistics - 
+            </span>
+            <span id="Label" class="bannerLabel"></span>
+          </div>
+        </div>
+  
+        <div id="StatisticsTableContainer" class="pageSection">
+            <table id="StatisticsTable" cellpadding="0" cellspacing="0" border="0" class="customTable">
+                <thead>
+                    <tr class="customTableHeaderGroup">
+                        <th colspan="5"> </th>
+                        <th colspan="2">Instances</th>
+                        <th colspan="1"> </th>
+                    </tr>
+                    <tr>
+                        <th>Date</th>
+                        <th>Organizations</th>
+                        <th>Spaces</th>
+                        <th>Users</th>
+                        <th>Apps</th>
+                        <th>Total</th>
+                        <th>Running</th>
+                        <th>DEAs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pageSection">
+            <div id="StatisticsChart" style="height: 420px; width: 730px;"></div>
+        </div>
+
+    </body>
+
+</html>
