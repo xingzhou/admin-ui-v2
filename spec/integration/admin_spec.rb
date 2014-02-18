@@ -42,6 +42,51 @@ describe AdminUI::Admin, :type => :integration do
     JSON.parse(body)
   end
 
+  def put_request(path)
+    request = Net::HTTP::Put.new(path)
+    request['Cookie'] = cookie
+    request['Content-Length'] = 0
+
+    response = http.request(request)
+
+    response
+  end
+
+  context 'manage application' do
+    let(:http)   { create_http }
+    let(:cookie) { login_and_return_cookie(http) }
+
+    def start_app
+      response = put_request('/start_application?app=test_org/test_space/test')
+      expect(response.is_a?Net::HTTPNoContent).to be_true
+    end
+
+    def stop_app
+      response = put_request('/stop_application?app=test_org/test_space/test')
+      expect(response.is_a?Net::HTTPNoContent).to be_true
+    end
+
+    def restart_app
+      response = put_request('/restart_application?app=test_org/test_space/test')
+      expect(response.is_a?Net::HTTPNoContent).to be_true
+    end
+
+    it 'stops the running application' do
+      expect { stop_app }.to change { get_json('/applications')['items'][0]['state'] }.from('STARTED').to('STOPPED')
+    end
+
+    it 'starts the stopped application' do
+      stop_app
+      expect { start_app }.to change { get_json('/applications')['items'][0]['state'] }.from('STOPPED').to('STARTED')
+    end
+
+    it 'restarts the application' do
+      restart_app
+      expect(get_json('/applications')['items'][0]['state']).to eq('STARTED')
+    end
+
+  end
+
   context 'retrieves and validates' do
     let(:http)   { create_http }
     let(:cookie) { login_and_return_cookie(http) }
@@ -221,6 +266,11 @@ describe AdminUI::Admin, :type => :integration do
       let(:varz_name) { nats_router['host'] }
       let(:path)      { '/routers' }
       let(:varz_uri)  { nats_router_varz }
+    end
+
+    it_behaves_like('retrieves cc entity/metadata record') do
+      let(:path)      { '/routes' }
+      let(:cc_source) { cc_routes }
     end
 
     it_behaves_like('retrieves cc entity/metadata record') do

@@ -21,6 +21,7 @@ module AdminUI
       setup_traps
       setup_config
       setup_logger
+      setup_client
       setup_components
 
       display_files
@@ -29,6 +30,10 @@ module AdminUI
     end
 
     private
+
+    def setup_client
+      @client = RestClient.new(@config, @logger)
+    end
 
     def setup_traps
       %w(TERM INT).each { |sig| trap(sig) { exit! } }
@@ -47,11 +52,11 @@ module AdminUI
       email = EMail.new(@config, @logger)
       nats  = NATS.new(@config, @logger, email)
 
-      @cc        = CC.new(@config, @logger)
+      @cc        = CC.new(@config, @logger, @client)
       @log_files = LogFiles.new(@config, @logger)
       @tasks     = Tasks.new(@config, @logger)
       @varz      = VARZ.new(@config, @logger, nats)
-      @operation = Operation.new(@config, @logger, @cc, @varz)
+      @operation = Operation.new(@config, @logger, @cc, @client, @varz)
       @stats     = Stats.new(@config, @logger, @cc, @varz)
     end
 

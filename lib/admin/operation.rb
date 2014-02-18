@@ -1,28 +1,29 @@
 module AdminUI
   class Operation
-    def initialize(config, logger, cc, varz)
+    def initialize(config, logger, cc, client, varz)
       @cc     = cc
+      @client = client
       @config = config
       @logger = logger
       @varz   = varz
-
-      setup_client
     end
 
     def manage_application(method, organization, space, application_name)
       url = find_app_url(organization, space, application_name)
+      app = {}
+
       if(method.upcase == 'START')
-        @client.put_cc(url, '{"state":"STARTED"}')
+        app = @client.put_cc(url, '{"state":"STARTED"}')
       elsif(method.upcase == 'STOP')
-        @client.put_cc(url, '{"state":"STOPPED"}')
+        app = @client.put_cc(url, '{"state":"STOPPED"}')
       elsif(method.upcase == 'RESTART')
-        @client.put_cc(url, '{"state":"STOPPED"}')
-        @client.put_cc(url, '{"state":"STARTED"}')
+        app = @client.put_cc(url, '{"state":"STOPPED"}')
+        app = @client.put_cc(url, '{"state":"STARTED"}')
       end
 
-      sleep(5)
+      @cc.refresh_application_state(app)
+      #sleep(5)
 
-      @cc.refresh_application(url)
       @varz.refresh
     end
 
@@ -35,10 +36,6 @@ module AdminUI
     end
 
     private
-
-    def setup_client
-      @client = RestClient.new(@config, @logger)
-    end
 
     def find_app_url(organization_name, space_name, app_name)
       organizations = @cc.organizations

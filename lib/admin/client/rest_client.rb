@@ -22,7 +22,6 @@ module AdminUI
         return resources if next_url.nil?
         uri = "#{ @config.cloud_controller_uri }#{ next_url }"
       end
-
       resources
     end
 
@@ -108,7 +107,7 @@ module AdminUI
     def info
       return unless @token_endpoint.nil?
 
-      response = Utils.http_request(@config, "#{ @config.cloud_controller_uri }/info")
+      response = Utils.http_request(@config, "#{ @config.cloud_controller_uri }/info", 'GET')
 
       if response.is_a?(Net::HTTPOK)
         body_json = JSON.parse(response.body)

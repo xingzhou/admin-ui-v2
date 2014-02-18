@@ -4,6 +4,7 @@ require_relative '../spec_helper'
 describe AdminUI::CC, :type => :integration do
   include CCHelper
 
+
   let(:log_file) { '/tmp/admin_ui.log' }
   let(:logger) { Logger.new(log_file) }
   let(:config) do
@@ -11,19 +12,24 @@ describe AdminUI::CC, :type => :integration do
                          :cloud_controller_uri                => 'http://api.cloudfoundry',
                          :uaa_admin_credentials               => { :username => 'user', :password => 'password' })
   end
+  let(:client) { AdminUI::RestClient.new(config, logger)}
 
   before do
     AdminUI::Config.any_instance.stub(:validate)
     cc_stub(config)
   end
 
-  let(:cc) { AdminUI::CC.new(config, logger) }
+  let(:cc) { AdminUI::CC.new(config, logger, client) }
 
   after do
     Process.wait(Process.spawn({}, "rm -fr #{ log_file }"))
   end
 
   context 'Stubbed HTTP' do
+    it "refreshes the application's state" do
+      expect { cc.refresh_application_state(cc_stopped_app)}.to change {cc.applications['items'][0]['state']}.from('STARTED').to('STOPPED')
+    end
+
     it 'returns connected applications' do
       applications = cc.applications
 
@@ -58,6 +64,21 @@ describe AdminUI::CC, :type => :integration do
       items = organizations['items']
 
       resources = cc_organizations['resources']
+
+      expect(items.length).to be(resources.length)
+
+      resources.each do |resource|
+        expect(items).to include(resource['entity'].merge(resource['metadata']))
+      end
+    end
+
+    it 'returns connected routes' do
+      routes = cc.routes
+
+      expect(routes['connected']).to eq(true)
+      items = routes['items']
+
+      resources = cc_routes['resources']
 
       expect(items.length).to be(resources.length)
 

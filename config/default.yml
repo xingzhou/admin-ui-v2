@@ -1,7 +1,8 @@
 ---
 cloud_controller_discovery_interval: 300
-cloud_controller_uri: http://api.ng.w3.bluemix.net
+cloud_controller_uri: http://api.10.244.0.34.xip.io
 component_connection_retries: 2
+cloud_controller_ssl_verify_none: true
 data_file: data/data.json
 log_file: admin_ui.log
 log_file_page_size: 51200
@@ -11,7 +12,7 @@ log_files:
 - "sftp://vcap@10.0.116.16/var/vcap/sys/log/**/*.log"
 - "sftp://vcap@10.0.116.29/var/vcap/sys/log/**/*.log"
 - "sftp://vcap@10.0.116.15/var/vcap/sys/log/**/*.log"
-mbus: nats://nats:time4fun@10.0.116.34:4222
+mbus: nats://nats:nats@10.244.0.6:4222
 monitored_components: [NATS, CloudController, DEA, HealthManager, Router, -Provisioner, ALL]
 nats_discovery_interval: 30
 nats_discovery_timeout: 10
@@ -26,8 +27,8 @@ stats_retries: 5
 stats_retry_interval: 300
 tasks_refresh_interval: 5000
 uaa_admin_credentials:
-  username: ibmadmin@us.ibm.com
-  password: 9yz79^*
+  username: admin
+  password: admin
 ui_credentials:
   username: IBMadmin
   password: IBM0331password

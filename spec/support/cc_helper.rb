@@ -31,6 +31,10 @@ module CCHelper
       OK.new(cc_organizations)
     end
 
+    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/routes?inline-relations-depth=1", 'GET', anything, anything, anything) do
+      OK.new(cc_routes)
+    end
+
     AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/services", 'GET', anything, anything, anything) do
       OK.new(cc_services)
     end
@@ -106,6 +110,92 @@ module CCHelper
           }
         }
       ]
+    }
+  end
+
+  def cc_routes
+    {
+      'total_results' => 1,
+      'resources'     =>
+      [
+        {
+          'metadata' =>
+          {
+            'created_at' => '2014-02-12T09:40:52-06:00',
+            'guid'       => 'route1'
+          },
+          'entity' =>
+          {
+            'host'   => 'test_host',
+            'domain' =>
+            {
+                'metadata' =>
+                {
+                  'created_at' => '2014-02-12T09:40:52-06:00',
+                  'guid'       => 'domain1'
+                },
+                'entity'   =>
+                {
+                  'name' => 'test_domain'
+                }
+            },
+            'space' =>
+            {
+                'metadata' =>
+                {
+                  'created_at' => '2014-02-12T09:40:52-06:00',
+                  'guid'       => 'space1'
+                },
+                'entity'   =>
+                {
+                  'name' => 'test_space'
+                }
+            }
+          }
+        }
+      ]
+    }
+  end
+
+  def cc_started_app
+    {
+        'metadata' =>
+            {
+                'created_at' => '2013-10-18T08:28:35-05:00',
+                'guid'       => 'application1'
+            },
+        'entity'   =>
+            {
+                'detected_buildpack' => 'Ruby/Rack',
+                'disk_quota'         => 12,
+                'instances'          => 1,
+                'memory'             => 11,
+                'name'               => 'test',
+                'package_state'      => 'STAGED',
+                'space_guid'         => 'space1',
+                'state'              => 'STARTED'
+            }
+    }
+  end
+
+  def cc_stopped_app
+    {
+        'metadata' =>
+            {
+                'created_at' => '2013-10-18T08:28:35-05:00',
+                'guid'       => 'application1'
+            },
+        'entity'   =>
+            {
+                'detected_buildpack' => 'Ruby/Rack',
+                'disk_quota'         => 12,
+                'instances'          => 1,
+                'memory'             => 11,
+                'name'               => 'test',
+                'package_state'      => 'STAGED',
+                'space_guid'         => 'space1',
+                'state'              => 'STOPPED'
+            }
     }
   end
 
