@@ -3,7 +3,6 @@ require 'uri'
 
 module AdminUI
   class Utils
-
     def self.time_in_milliseconds(time = Time.now)
       (time.to_f * 1000).to_i
     end

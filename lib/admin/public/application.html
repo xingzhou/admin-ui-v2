@@ -34,7 +34,8 @@
         <script src="js/app/tabs/healthManagersTab.js"></script> 
         <script src="js/app/tabs/logsTab.js"></script>
         <script src="js/app/tabs/organizationsTab.js"></script>  
-        <script src="js/app/tabs/routersTab.js"></script>        
+        <script src="js/app/tabs/routersTab.js"></script>
+        <script src="js/app/tabs/routesTab.js"></script>
         <script src="js/app/tabs/serviceInstancesTab.js"></script>
         <script src="js/app/tabs/spacesTab.js"></script>
         <script src="js/app/tabs/statsTab.js"></script>
@@ -122,6 +123,10 @@
 
             <span id="Routers" class="menuItem">
                 Routers
+            </span>
+
+            <span id="Routes" class="menuItem">
+                Routes
             </span>
 
             <span id="Components" class="menuItem">
@@ -255,6 +260,21 @@
 
                 </div>
 
+            </div>
+
+            <div id="RoutesPage" class="page hiddenPage">
+                <div id="RoutesTableContainer" class="pageSection">
+                    <table id="RoutesTable" cellpadding="0" cellspacing="0" border="0" class="customTable">
+                        <tbody>
+                            <tr>
+                                <th>Check</th>
+                                <th>Host</th>
+                                <th>Domain</th>
+                                <th>Applications</th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div id="DEAsPage" class="page hiddenPage">

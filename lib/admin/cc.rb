@@ -70,6 +70,22 @@ module AdminUI
       end
     end
 
+    def remove_route_from_cache(route)
+      hash = @caches[:routes]
+      hash[:semaphore].synchronize do
+        hash[:condition].wait(hash[:semaphore]) while hash[:result].nil?
+        result = hash[:result]
+        routes = result['items']
+
+        routes.each do |cached_route|
+          if route == cached_route['host'] + '.' + cached_route['domain']['entity']['name']
+            routes.delete(cached_route)
+            break
+          end
+        end
+      end
+    end
+
     def routes
       result_cache(:routes)
     end

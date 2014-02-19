@@ -17,7 +17,7 @@ describe AdminUI::Operation, :type => :integration do
                          :monitored_components                => [],
                          :uaa_admin_credentials               => { :username => 'user', :password => 'password' })
   end
-  let(:client) { AdminUI::RestClient.new(config, logger)}
+  let(:client) { AdminUI::RestClient.new(config, logger) }
 
   before do
     AdminUI::Config.any_instance.stub(:validate)
@@ -38,7 +38,7 @@ describe AdminUI::Operation, :type => :integration do
   end
 
   context 'Stubbed HTTP' do
-    context 'mange application' do
+    context 'manage application' do
       it 'stops the running application' do
         expect { operation.manage_application('STOP', 'test_org', 'test_space', 'test') }.to change { cc.applications['items'][0]['state'] }.from('STARTED').to('STOPPED')
       end
@@ -50,8 +50,14 @@ describe AdminUI::Operation, :type => :integration do
 
       it 'restarts the application' do
         operation.manage_application('RESTART', 'test_org', 'test_space', 'test')
-        expect { cc.applications['items'][0]['state'] }.to be eq('STARTED')
+        expect(cc.applications['items'][0]['state']).to eq('STARTED')
       end
+    end
+  end
+
+  context 'manage route' do
+    it 'deletes specific route' do
+      expect { operation.manage_route('DELETE', 'test_host.test_domain') }.to change { cc.routes['items'].length }.from(1).to(0)
     end
   end
 end

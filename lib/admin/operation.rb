@@ -12,17 +12,21 @@ module AdminUI
       url = find_app_url(organization, space, application_name)
       app = {}
 
-      if(method.upcase == 'START')
+      if method.upcase == 'START'
         app = @client.put_cc(url, '{"state":"STARTED"}')
-      elsif(method.upcase == 'STOP')
+      elsif method.upcase == 'STOP'
         app = @client.put_cc(url, '{"state":"STOPPED"}')
-      elsif(method.upcase == 'RESTART')
-        app = @client.put_cc(url, '{"state":"STOPPED"}')
+      elsif method.upcase == 'RESTART'
+        @client.put_cc(url, '{"state":"STOPPED"}')
         app = @client.put_cc(url, '{"state":"STARTED"}')
       end
 
       @cc.refresh_application_state(app)
-      #sleep(5)
+
+      # Wait some time for varz to take a info refresh
+      # Todos: We need to improve the Admin-UI backend service framework
+      # in the future that enables some polling and refreshing
+      sleep(5)
 
       @varz.refresh
     end
@@ -30,8 +34,9 @@ module AdminUI
     def manage_route(method, route)
       url = find_route_url(route)
 
-      if(method.upcase == 'DELETE')
+      if method.upcase == 'DELETE'
         @client.delete_cc(url)
+        @cc.remove_route_from_cache(route)
       end
     end
 
@@ -41,7 +46,7 @@ module AdminUI
       organizations = @cc.organizations
       organization_id = nil
       organizations['items'].each do |organization|
-        if(organization['name'] == organization_name)
+        if organization['name'] == organization_name
           organization_id = organization['guid']
           break
         end
@@ -50,32 +55,28 @@ module AdminUI
       spaces = @cc.spaces
       space_id = nil
       spaces['items'].each do |space|
-        if(space['organization_guid'] == organization_id && space['name'] == space_name)
+        if space['organization_guid'] == organization_id && space['name'] == space_name
           space_id = space['guid']
-          break;
+          break
         end
       end
 
       apps = @cc.applications
-      app_id = nil
       apps['items'].each do |app|
-        if(app['space_guid'] == space_id && app['name'] == app_name)
-          app_id = app['guid']
+        if app['space_guid'] == space_id && app['name'] == app_name
+          return "v2/apps/#{ app['guid'] }"
         end
       end
-
-      "v2/apps/#{ app_id }"
     end
 
     def find_route_url(route)
       routes = @cc.routes
-      routes = routes['items']
-      routes.each do |item|
-        if(route == item['host'] + '.' + item['domain']['entity']['name'])
-           return item['url']
+
+      routes['items'].each do |item|
+        if route == item['host'] + '.' + item['domain']['entity']['name']
+          return "v2/routes/#{ item['guid'] }"
         end
       end
     end
   end
-
 end

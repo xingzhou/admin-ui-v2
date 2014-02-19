@@ -52,6 +52,30 @@ describe AdminUI::Admin, :type => :integration do
     response
   end
 
+  def delete_request(path)
+    request = Net::HTTP::Delete.new(path)
+    request['Cookie'] = cookie
+    request['Content-Length'] = 0
+
+    response = http.request(request)
+
+    response
+  end
+
+  context 'manage route' do
+    let(:http)   { create_http }
+    let(:cookie) { login_and_return_cookie(http) }
+
+    def delete_route
+      response = delete_request('/route?route=test_host.test_domain')
+      expect(response.is_a?Net::HTTPNoContent).to be_true
+    end
+
+    it 'deletes the specific route' do
+      expect { delete_route }.to change { get_json('/routes')['items'].length }.from(1).to(0)
+    end
+  end
+
   context 'manage application' do
     let(:http)   { create_http }
     let(:cookie) { login_and_return_cookie(http) }

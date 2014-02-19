@@ -4,7 +4,6 @@ require_relative '../spec_helper'
 describe AdminUI::CC, :type => :integration do
   include CCHelper
 
-
   let(:log_file) { '/tmp/admin_ui.log' }
   let(:logger) { Logger.new(log_file) }
   let(:config) do
@@ -12,7 +11,7 @@ describe AdminUI::CC, :type => :integration do
                          :cloud_controller_uri                => 'http://api.cloudfoundry',
                          :uaa_admin_credentials               => { :username => 'user', :password => 'password' })
   end
-  let(:client) { AdminUI::RestClient.new(config, logger)}
+  let(:client) { AdminUI::RestClient.new(config, logger) }
 
   before do
     AdminUI::Config.any_instance.stub(:validate)
@@ -27,7 +26,11 @@ describe AdminUI::CC, :type => :integration do
 
   context 'Stubbed HTTP' do
     it "refreshes the application's state" do
-      expect { cc.refresh_application_state(cc_stopped_app)}.to change {cc.applications['items'][0]['state']}.from('STARTED').to('STOPPED')
+      expect { cc.refresh_application_state(cc_stopped_app) }.to change { cc.applications['items'][0]['state'] }.from('STARTED').to('STOPPED')
+    end
+
+    it 'removes the deleted route' do
+      expect { cc.remove_route_from_cache('test_host.test_domain') }.to change { cc.routes['items'].length }.from(1).to(0)
     end
 
     it 'returns connected applications' do
