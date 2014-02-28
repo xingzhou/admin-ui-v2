@@ -62,20 +62,6 @@ describe AdminUI::Admin, :type => :integration do
     response
   end
 
-  context 'manage route' do
-    let(:http)   { create_http }
-    let(:cookie) { login_and_return_cookie(http) }
-
-    def delete_route
-      response = delete_request('/route?route=test_host.test_domain')
-      expect(response.is_a?Net::HTTPNoContent).to be_true
-    end
-
-    it 'deletes the specific route' do
-      expect { delete_route }.to change { get_json('/routes')['items'].length }.from(1).to(0)
-    end
-  end
-
   context 'manage application' do
     let(:http)   { create_http }
     let(:cookie) { login_and_return_cookie(http) }
@@ -108,7 +94,34 @@ describe AdminUI::Admin, :type => :integration do
       restart_app
       expect(get_json('/applications')['items'][0]['state']).to eq('STARTED')
     end
+  end
 
+  context 'manage route' do
+    let(:http)   { create_http }
+    let(:cookie) { login_and_return_cookie(http) }
+
+    def delete_route
+      response = delete_request('/route?route=test_host.test_domain')
+      expect(response.is_a?Net::HTTPNoContent).to be_true
+    end
+
+    it 'deletes the specific route' do
+      expect { delete_route }.to change { get_json('/routes')['items'].length }.from(1).to(0)
+    end
+  end
+
+  context 'manage service' do
+    let(:http)   { create_http }
+    let(:cookie) { login_and_return_cookie(http) }
+
+    def turn_service_2_public
+      response = put_request('/turn_service_2_public?service_guid=service1')
+      expect(response.is_a?Net::HTTPNoContent).to be_true
+    end
+
+    it 'turns service to public' do
+      expect { turn_service_2_public }.to change { get_json('/service_plans')['items'][0]['public'] }.from(false).to(true)
+    end
   end
 
   context 'retrieves and validates' do

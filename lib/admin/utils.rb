@@ -3,10 +3,6 @@ require 'uri'
 
 module AdminUI
   class Utils
-    def self.time_in_milliseconds(time = Time.now)
-      (time.to_f * 1000).to_i
-    end
-
     HTTP_METHODS = {
         'DELETE' => Net::HTTP::Delete,
         'GET'    => Net::HTTP::Get,
@@ -14,6 +10,10 @@ module AdminUI
         'PUT'    => Net::HTTP::Put,
         'POST'   => Net::HTTP::Post
     }
+
+    def self.time_in_milliseconds(time = Time.now)
+      (time.to_f * 1000).to_i
+    end
 
     def self.get_method_class(method_string)
       HTTP_METHODS[method_string.upcase]

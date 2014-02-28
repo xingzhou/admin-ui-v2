@@ -40,6 +40,20 @@ module AdminUI
       end
     end
 
+    def manage_service(method, service_guid)
+      if method.upcase == 'TURN_PUBLIC'
+        plans = find_service_plans_by_service(service_guid)
+
+        plans.each do |plan|
+          unless plan['public']
+            plan = @client.put_cc('v2/service_plans/' + plan['guid'], '{"public":true}')
+            @cc.refresh_service_plan_visibility_state(plan)
+          end
+        end
+
+      end
+    end
+
     private
 
     def find_app_url(organization_name, space_name, app_name)
@@ -77,6 +91,20 @@ module AdminUI
           return "v2/routes/#{ item['guid'] }"
         end
       end
+    end
+
+    def find_service_plans_by_service(service_guid)
+      plans = []
+
+      original_plans = @cc.service_plans
+
+      original_plans['items'].each do |original_plan|
+        if original_plan['service_guid'] == service_guid
+          plans.push(original_plan)
+        end
+      end
+
+      plans
     end
   end
 end

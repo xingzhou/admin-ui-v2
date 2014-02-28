@@ -248,6 +248,16 @@ module AdminUI
       204
     end
 
+    put '/turn_service_2_public', :auth => [:admin] do
+      service_guid = params['service_guid']
+
+      return 400 unless service_guid
+
+      @operation.manage_service('TURN_PUBLIC', service_guid)
+
+      204
+    end
+
     delete '/components', :auth => [:user] do
       @varz.remove(params['uri'])
 

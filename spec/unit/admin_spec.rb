@@ -182,6 +182,18 @@ describe AdminUI::Admin do
       end
     end
 
+    context 'turn service to public' do
+      it 'returns 400 when the param is not valid' do
+        response = put('/turn_service_2_public')
+        expect(response.is_a?(Net::HTTPBadRequest)).to be_true
+      end
+
+      it 'returns failure code due to disconnection' do
+        response = put('/turn_service_2_public?service_guid=service1')
+        expect(response.is_a?(Net::HTTPNoContent)).to be_true
+      end
+    end
+
     it '/applications succeeds' do
       verify_disconnected_items('/applications')
     end
@@ -338,12 +350,12 @@ describe AdminUI::Admin do
       redirects_as_expected('/organizations')
     end
 
-    it '/routes redirects as expected' do
-      redirects_as_expected('/routes')
-    end
-
     it '/routers redirects as expected' do
       redirects_as_expected('/routers')
+    end
+
+    it '/routes redirects as expected' do
+      redirects_as_expected('/routes')
     end
 
     it '/settings redirects as expected' do
@@ -394,20 +406,24 @@ describe AdminUI::Admin do
       redirects_as_expected('/users')
     end
 
-    it 'delete /route redirects as expected' do
+    it 'deletes /route redirects as expected' do
       redirects_as_expected_4_delete('/route?route=hello.10.244.0.34.xip.io')
     end
 
-    it 'put /restart_application redirects as expected' do
+    it 'puts /restart_application redirects as expected' do
       redirects_as_expected_4_put('/restart_application?app=ibm/dev/hello')
     end
 
-    it 'put /start_application redirects as expected' do
+    it 'puts /start_application redirects as expected' do
       redirects_as_expected_4_put('/start_application?app=ibm/dev/hello')
     end
 
-    it 'put /stop_application redirects as expected' do
+    it 'puts /stop_application redirects as expected' do
       redirects_as_expected_4_put('/stop_application?app=ibm/dev/hello')
+    end
+
+    it 'puts /turn_service_2_public redirects as expected' do
+      redirects_as_expected_4_put('/turn_service_2_public?service_guid=service1')
     end
 
   end

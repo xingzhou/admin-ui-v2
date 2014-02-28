@@ -113,6 +113,26 @@ module CCHelper
     }
   end
 
+  def cc_public_service_plan
+    {
+      'metadata' =>
+          {
+              'created_at' => '2014-02-12T09:34:10-06:00',
+              'guid'       => 'service_plan1'
+          },
+      'entity'   =>
+          {
+              'description'  => 'TestServicePlan description',
+              'extra'        => 'service plan extra',
+              'free'         => true,
+              'name'         => 'TestServicePlan',
+              'public'       => true,
+              'service_guid' => 'service1',
+              'unique_id'    => 'service_plan_unique_id1'
+          }
+    }
+  end
+
   def cc_routes
     {
       'total_results' => 1,
@@ -288,7 +308,7 @@ module CCHelper
             'extra'        => 'service plan extra',
             'free'         => true,
             'name'         => 'TestServicePlan',
-            'public'       => true,
+            'public'       => false,
             'service_guid' => 'service1',
             'unique_id'    => 'service_plan_unique_id1'
           }

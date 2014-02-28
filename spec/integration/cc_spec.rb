@@ -29,6 +29,10 @@ describe AdminUI::CC, :type => :integration do
       expect { cc.refresh_application_state(cc_stopped_app) }.to change { cc.applications['items'][0]['state'] }.from('STARTED').to('STOPPED')
     end
 
+    it "refreshes the service plan's visibility state" do
+      expect { cc.refresh_service_plan_visibility_state(cc_public_service_plan) }.to change { cc.service_plans['items'][0]['public'] }.from(false).to(true)
+    end
+
     it 'removes the deleted route' do
       expect { cc.remove_route_from_cache('test_host.test_domain') }.to change { cc.routes['items'].length }.from(1).to(0)
     end

@@ -11,7 +11,7 @@ describe AdminUI::Operation, :type => :integration do
   let(:log_file) { '/tmp/admin_ui.log' }
   let(:logger) { Logger.new(log_file) }
   let(:config) do
-    AdminUI::Config.load(:cloud_controller_discovery_interval => 1,
+    AdminUI::Config.load(:cloud_controller_discovery_interval => 10,
                          :cloud_controller_uri                => 'http://api.cloudfoundry',
                          :data_file                           => data_file,
                          :monitored_components                => [],
@@ -58,6 +58,12 @@ describe AdminUI::Operation, :type => :integration do
   context 'manage route' do
     it 'deletes specific route' do
       expect { operation.manage_route('DELETE', 'test_host.test_domain') }.to change { cc.routes['items'].length }.from(1).to(0)
+    end
+  end
+
+  context 'manage service' do
+    it 'turns all the service plans under the service to public' do
+      expect { operation.manage_service('TURN_PUBLIC', 'service1') }.to change { cc.service_plans['items'][0]['public'] }.from(false).to(true)
     end
   end
 end

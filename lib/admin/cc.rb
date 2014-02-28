@@ -70,6 +70,22 @@ module AdminUI
       end
     end
 
+    def refresh_service_plan_visibility_state(plan)
+      hash = @caches[:service_plans]
+      hash[:semaphore].synchronize do
+        hash[:condition].wait(hash[:semaphore]) while hash[:result].nil?
+        result = hash[:result]
+        plans = result['items']
+
+        plans.each do |cached_plan|
+          if cached_plan['guid'] == plan['metadata']['guid']
+            cached_plan['public'] = plan['entity']['public']
+            break
+          end
+        end
+      end
+    end
+
     def remove_route_from_cache(route)
       hash = @caches[:routes]
       hash[:semaphore].synchronize do
