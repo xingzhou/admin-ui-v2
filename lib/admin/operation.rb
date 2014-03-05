@@ -10,25 +10,18 @@ module AdminUI
 
     def manage_application(method, organization, space, application_name)
       url = find_app_url(organization, space, application_name)
-      app = {}
 
       if method.upcase == 'START'
-        app = @client.put_cc(url, '{"state":"STARTED"}')
+        @client.put_cc(url, '{"state":"STARTED"}')
       elsif method.upcase == 'STOP'
-        app = @client.put_cc(url, '{"state":"STOPPED"}')
+        @client.put_cc(url, '{"state":"STOPPED"}')
       elsif method.upcase == 'RESTART'
         @client.put_cc(url, '{"state":"STOPPED"}')
-        app = @client.put_cc(url, '{"state":"STARTED"}')
+        @client.put_cc(url, '{"state":"STARTED"}')
       end
 
-      @cc.refresh_application_state(app)
-
-      # Wait some time for varz to take a info refresh
-      # Todos: We need to improve the Admin-UI backend service framework
-      # in the future that enables some polling and refreshing
-      sleep(5)
-
-      @varz.refresh
+      @cc.refresh_applications
+      @varz.reload
     end
 
     def manage_route(method, route)
@@ -36,7 +29,7 @@ module AdminUI
 
       if method.upcase == 'DELETE'
         @client.delete_cc(url)
-        @cc.remove_route_from_cache(route)
+        @cc.refresh_routes
       end
     end
 

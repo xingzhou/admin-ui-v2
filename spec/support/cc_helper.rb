@@ -15,79 +15,79 @@ module CCHelper
   end
 
   def cc_stub(config)
-    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/info", 'GET') do
+    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/info", AdminUI::Utils::HTTP_GET) do
       OK.new(cc_info)
     end
 
-    AdminUI::Utils.stub(:http_request).with(anything, "#{ authorization_endpoint }/oauth/token", 'POST', anything, anything, anything) do
+    AdminUI::Utils.stub(:http_request).with(anything, "#{ authorization_endpoint }/oauth/token", AdminUI::Utils::HTTP_POST, anything, anything, anything) do
       OK.new(uaa_oauth)
     end
 
-    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/apps", 'GET', anything, anything, anything) do
-      OK.new(cc_apps)
+    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/apps", AdminUI::Utils::HTTP_GET, anything, anything, anything) do
+      OK.new(cc_started_apps)
     end
 
-    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/organizations", 'GET', anything, anything, anything) do
+    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/organizations", AdminUI::Utils::HTTP_GET, anything, anything, anything) do
       OK.new(cc_organizations)
     end
 
-    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/routes?inline-relations-depth=1", 'GET', anything, anything, anything) do
+    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/routes?inline-relations-depth=1", AdminUI::Utils::HTTP_GET, anything, anything, anything) do
       OK.new(cc_routes)
     end
 
-    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/services", 'GET', anything, anything, anything) do
+    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/services", AdminUI::Utils::HTTP_GET, anything, anything, anything) do
       OK.new(cc_services)
     end
 
-    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/service_bindings", 'GET', anything, anything, anything) do
+    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/service_bindings", AdminUI::Utils::HTTP_GET, anything, anything, anything) do
       OK.new(cc_service_bindings)
     end
 
-    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/service_instances", 'GET', anything, anything, anything) do
+    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/service_instances", AdminUI::Utils::HTTP_GET, anything, anything, anything) do
       OK.new(cc_service_instances)
     end
 
-    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/service_plans", 'GET', anything, anything, anything) do
+    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/service_plans", AdminUI::Utils::HTTP_GET, anything, anything, anything) do
       OK.new(cc_service_plans)
     end
 
-    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/spaces", 'GET', anything, anything, anything) do
+    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/spaces", AdminUI::Utils::HTTP_GET, anything, anything, anything) do
       OK.new(cc_spaces)
     end
 
-    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/users?inline-relations-depth=1", 'GET', anything, anything, anything) do
+    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/users?inline-relations-depth=1", AdminUI::Utils::HTTP_GET, anything, anything, anything) do
       OK.new(cc_users_deep)
     end
 
-    AdminUI::Utils.stub(:http_request).with(anything, "#{ token_endpoint }/Users", 'GET', anything, anything, anything) do
+    AdminUI::Utils.stub(:http_request).with(anything, "#{ token_endpoint }/Users", AdminUI::Utils::HTTP_GET, anything, anything, anything) do
       OK.new(uaa_users)
     end
   end
 
-  def cc_apps
+  def cc_apps_start_to_stop_stub(config)
+    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/apps", AdminUI::Utils::HTTP_GET, anything, anything, anything).and_return(CCHelper::OK.new(cc_started_apps), CCHelper::OK.new(cc_stopped_apps))
+  end
+
+  def cc_apps_stop_to_start_stub(config)
+    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/apps", AdminUI::Utils::HTTP_GET, anything, anything, anything).and_return(CCHelper::OK.new(cc_stopped_apps), CCHelper::OK.new(cc_started_apps))
+  end
+
+  def cc_routes_delete_stub(config)
+    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/routes?inline-relations-depth=1", AdminUI::Utils::HTTP_GET, anything, anything, anything).and_return(CCHelper::OK.new(cc_routes), CCHelper::OK.new(cc_empty_routes))
+  end
+
+  def cc_stopped_apps_stub(config)
+    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/apps", AdminUI::Utils::HTTP_GET, anything, anything, anything).and_return(CCHelper::OK.new(cc_stopped_apps))
+  end
+
+  def cc_empty_routes_stub(config)
+    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/routes?inline-relations-depth=1", AdminUI::Utils::HTTP_GET, anything, anything, anything).and_return(CCHelper::OK.new(cc_empty_routes))
+  end
+
+  def cc_empty_routes
     {
-      'total_results' => 1,
-      'resources'     =>
-      [
-        {
-          'metadata' =>
-          {
-            'created_at' => '2013-10-18T08:28:35-05:00',
-            'guid'       => 'application1'
-          },
-          'entity'   =>
-          {
-            'detected_buildpack' => 'Ruby/Rack',
-            'disk_quota'         => 12,
-            'instances'          => 1,
-            'memory'             => 11,
-            'name'               => 'test',
-            'package_state'      => 'STAGED',
-            'space_guid'         => 'space1',
-            'state'              => 'STARTED'
-          }
-        }
-      ]
+      'total_results' => 0,
+      'resources'     => []
     }
   end
 
@@ -147,6 +147,7 @@ module CCHelper
           'entity' =>
           {
             'host'   => 'test_host',
+            'space_guid' => 'space1',
             'domain' =>
             {
                 'metadata' =>
@@ -170,7 +171,28 @@ module CCHelper
                 {
                   'name' => 'test_space'
                 }
-            }
+            },
+            'apps' =>
+            [
+                {
+                    'metadata' =>
+                        {
+                            'created_at' => '2013-10-18T08:28:35-05:00',
+                            'guid'       => 'application1'
+                        },
+                    'entity'   =>
+                        {
+                            'detected_buildpack' => 'Ruby/Rack',
+                            'disk_quota'         => 12,
+                            'instances'          => 1,
+                            'memory'             => 11,
+                            'name'               => 'test',
+                            'package_state'      => 'STAGED',
+                            'space_guid'         => 'space1',
+                            'state'              => 'STARTED'
+                        }
+                }
+            ]
           }
         }
       ]
@@ -216,6 +238,60 @@ module CCHelper
                 'space_guid'         => 'space1',
                 'state'              => 'STOPPED'
             }
+    }
+  end
+
+  def cc_started_apps
+    {
+        'total_results' => 1,
+        'resources'     =>
+            [
+                {
+                    'metadata' =>
+                        {
+                            'created_at' => '2013-10-18T08:28:35-05:00',
+                            'guid'       => 'application1'
+                        },
+                    'entity'   =>
+                        {
+                            'detected_buildpack' => 'Ruby/Rack',
+                            'disk_quota'         => 12,
+                            'instances'          => 1,
+                            'memory'             => 11,
+                            'name'               => 'test',
+                            'package_state'      => 'STAGED',
+                            'space_guid'         => 'space1',
+                            'state'              => 'STARTED'
+                        }
+                }
+            ]
+    }
+  end
+
+  def cc_stopped_apps
+    {
+        'total_results' => 1,
+        'resources'     =>
+            [
+                {
+                    'metadata' =>
+                        {
+                            'created_at' => '2013-10-18T08:28:35-05:00',
+                            'guid'       => 'application1'
+                        },
+                    'entity'   =>
+                        {
+                            'detected_buildpack' => 'Ruby/Rack',
+                            'disk_quota'         => 12,
+                            'instances'          => 1,
+                            'memory'             => 11,
+                            'name'               => 'test',
+                            'package_state'      => 'STAGED',
+                            'space_guid'         => 'space1',
+                            'state'              => 'STOPPED'
+                        }
+                }
+            ]
     }
   end
 

@@ -3,12 +3,18 @@ require 'uri'
 
 module AdminUI
   class Utils
-    HTTP_METHODS = {
-        'DELETE' => Net::HTTP::Delete,
-        'GET'    => Net::HTTP::Get,
-        'HEAD'   => Net::HTTP::Head,
-        'PUT'    => Net::HTTP::Put,
-        'POST'   => Net::HTTP::Post
+    HTTP_DELETE = 'DELETE'
+    HTTP_GET    = 'GET'
+    HTTP_HEAD   = 'HEAD'
+    HTTP_PUT    = 'PUT'
+    HTTP_POST   = 'POST'
+
+    HTTP_METHODS_MAP = {
+        HTTP_DELETE => Net::HTTP::Delete,
+        HTTP_GET    => Net::HTTP::Get,
+        HTTP_HEAD   => Net::HTTP::Head,
+        HTTP_PUT    => Net::HTTP::Put,
+        HTTP_POST   => Net::HTTP::Post
     }
 
     def self.time_in_milliseconds(time = Time.now)
@@ -16,10 +22,10 @@ module AdminUI
     end
 
     def self.get_method_class(method_string)
-      HTTP_METHODS[method_string.upcase]
+      HTTP_METHODS_MAP[method_string.upcase]
     end
 
-    def self.http_request(config, uri_string, method = 'GET', basic_auth_array = nil, body = nil, authorization_header = nil)
+    def self.http_request(config, uri_string, method = HTTP_GET, basic_auth_array = nil, body = nil, authorization_header = nil)
       uri = URI.parse(uri_string)
 
       path  = uri.path

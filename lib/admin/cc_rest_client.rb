@@ -1,4 +1,5 @@
 require 'json'
+require_relative 'utils'
 
 module AdminUI
   class RestClient
@@ -8,19 +9,19 @@ module AdminUI
     end
 
     def delete_cc(path)
-      cf_request('DELETE', get_cc_url(path), nil, nil)
+      cf_request(Utils::HTTP_DELETE, get_cc_url(path), nil, nil)
     end
 
     def get_cc(path)
-      uri = "#{ @config.cloud_controller_uri }/#{ path }"
+      uri = get_cc_url(path)
 
       resources = []
       loop do
-        json = cf_request('GET', uri, nil, nil)
+        json = cf_request(Utils::HTTP_GET, uri, nil, nil)
         resources.concat(json['resources'])
         next_url = json['next_url']
         return resources if next_url.nil?
-        uri = "#{ @config.cloud_controller_uri }#{ next_url }"
+        uri = get_cc_url(next_url)
       end
       resources
     end
@@ -32,7 +33,7 @@ module AdminUI
 
       resources = []
       loop do
-        json = cf_request('GET', uri, nil, nil)
+        json = cf_request(Utils::HTTP_GET, uri, nil, nil)
         resources.concat(json['resources'])
         total_results = json['totalResults']
         start_index = resources.length + 1
@@ -44,7 +45,7 @@ module AdminUI
     end
 
     def put_cc(path, body)
-      cf_request('PUT', get_cc_url(path), nil, body)
+      cf_request(AdminUI::Utils::HTTP_PUT, get_cc_url(path), nil, body)
     end
 
     private
@@ -59,11 +60,11 @@ module AdminUI
       loop do
         response = Utils.http_request(@config, url, method, basic_auth, body, @token)
 
-        if method == 'GET' && response.is_a?(Net::HTTPOK)
+        if method == Utils::HTTP_GET && response.is_a?(Net::HTTPOK)
           return JSON.parse(response.body)
-        elsif method == 'PUT' && (response.is_a?(Net::HTTPOK) || response.is_a?(Net::HTTPCreated))
+        elsif method == Utils::HTTP_PUT && (response.is_a?(Net::HTTPOK) || response.is_a?(Net::HTTPCreated))
           return JSON.parse(response.body)
-        elsif method == 'DELETE' && (response.is_a?(Net::HTTPOK) || response.is_a?(Net::HTTPNoContent))
+        elsif method == Utils::HTTP_DELETE && (response.is_a?(Net::HTTPOK) || response.is_a?(Net::HTTPNoContent))
           return
         end
 
@@ -92,7 +93,7 @@ module AdminUI
       response = Utils.http_request(
           @config,
           "#{ @authorization_endpoint }/oauth/token",
-          'POST',
+          Utils::HTTP_POST,
           nil,
           "grant_type=password&username=#{ @config.uaa_admin_credentials_username }&password=#{ @config.uaa_admin_credentials_password }",
           'Basic Y2Y6')
@@ -108,22 +109,22 @@ module AdminUI
     def info
       return unless @token_endpoint.nil?
 
-      response = Utils.http_request(@config, "#{ @config.cloud_controller_uri }/info", 'GET')
+      response = Utils.http_request(@config, get_cc_url('/info'), Utils::HTTP_GET)
 
       if response.is_a?(Net::HTTPOK)
         body_json = JSON.parse(response.body)
 
         @authorization_endpoint = body_json['authorization_endpoint']
         if @authorization_endpoint.nil?
-          fail "Information retrieved from #{ url } does not include authorization_endpoint"
+          fail "Information retrieved from #{ get_cc_url('/info') } does not include authorization_endpoint"
         end
 
         @token_endpoint = body_json['token_endpoint']
         if @token_endpoint.nil?
-          fail "Information retrieved from #{ url } does not include token_endpoint"
+          fail "Information retrieved from #{ get_cc_url('/info') } does not include token_endpoint"
         end
       else
-        fail "Unable to fetch info from #{ url }"
+        fail "Unable to fetch info from #{ get_cc_url('/info') }"
       end
     end
   end

@@ -82,11 +82,15 @@ describe AdminUI::Admin, :type => :integration do
     end
 
     it 'stops the running application' do
+      cc_stopped_apps_stub(AdminUI::Config.load(config))
       expect { stop_app }.to change { get_json('/applications')['items'][0]['state'] }.from('STARTED').to('STOPPED')
     end
 
     it 'starts the stopped application' do
+      # Make sure the app is in stopped state
+      cc_apps_stop_to_start_stub(AdminUI::Config.load(config))
       stop_app
+
       expect { start_app }.to change { get_json('/applications')['items'][0]['state'] }.from('STOPPED').to('STARTED')
     end
 
@@ -106,6 +110,7 @@ describe AdminUI::Admin, :type => :integration do
     end
 
     it 'deletes the specific route' do
+      cc_empty_routes_stub(AdminUI::Config.load(config))
       expect { delete_route }.to change { get_json('/routes')['items'].length }.from(1).to(0)
     end
   end
@@ -181,7 +186,7 @@ describe AdminUI::Admin, :type => :integration do
 
     it_behaves_like('retrieves cc entity/metadata record') do
       let(:path)      { '/applications' }
-      let(:cc_source) { cc_apps }
+      let(:cc_source) { cc_started_apps }
     end
 
     it_behaves_like('retrieves varz record') do
@@ -229,12 +234,12 @@ describe AdminUI::Admin, :type => :integration do
     context 'current_statistics' do
       let(:retrieved) { get_json('/current_statistics') }
       it 'retrieves' do
-        expect(retrieved).to include('apps'              => cc_apps['resources'].length,
+        expect(retrieved).to include('apps'              => cc_started_apps['resources'].length,
                                      'deas'              => 1,
                                      'organizations'     => cc_organizations['resources'].length,
-                                     'running_instances' => cc_apps['resources'].length,
+                                     'running_instances' => cc_started_apps['resources'].length,
                                      'spaces'            => cc_spaces['resources'].length,
-                                     'total_instances'   => cc_apps['resources'].length,
+                                     'total_instances'   => cc_started_apps['resources'].length,
                                      'users'             => uaa_users['resources'].length)
       end
     end

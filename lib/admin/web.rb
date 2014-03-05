@@ -207,45 +207,15 @@ module AdminUI
     end
 
     put '/restart_application',  :auth => [:admin] do
-      app_string = params['app']
-
-      return 400 unless app_string
-
-      array = app_string.split('/')
-
-      return 400 unless array.length == 3
-
-      @operation.manage_application('RESTART', array[0], array[1], array[2])
-
-      204
+      manage_application('RESTART', params)
     end
 
     put '/start_application', :auth => [:admin] do
-      app_string = params['app']
-
-      return 400 unless app_string
-
-      array = app_string.split('/')
-
-      return 400 unless array.length == 3
-
-      @operation.manage_application('START', array[0], array[1], array[2])
-
-      204
+      manage_application('START', params)
     end
 
     put '/stop_application', :auth => [:admin] do
-      app_string = params['app']
-
-      return 400 unless app_string
-
-      array = app_string.split('/')
-
-      return 400 unless array.length == 3
-
-      @operation.manage_application('STOP', array[0], array[1], array[2])
-
-      204
+      manage_application('STOP', params)
     end
 
     put '/turn_service_2_public', :auth => [:admin] do
@@ -293,6 +263,20 @@ module AdminUI
       else
         redirect 'login.html', 303
       end
+    end
+
+    def manage_application(method, params)
+      app_string = params['app']
+
+      return 400 unless app_string
+
+      array = app_string.split('/')
+
+      return 400 unless array.length == 3
+
+      @operation.manage_application(method, array[0], array[1], array[2])
+
+      204
     end
   end
 end

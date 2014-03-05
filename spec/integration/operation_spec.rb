@@ -40,11 +40,12 @@ describe AdminUI::Operation, :type => :integration do
   context 'Stubbed HTTP' do
     context 'manage application' do
       it 'stops the running application' do
+        cc_apps_start_to_stop_stub(config)
         expect { operation.manage_application('STOP', 'test_org', 'test_space', 'test') }.to change { cc.applications['items'][0]['state'] }.from('STARTED').to('STOPPED')
       end
 
       it 'starts the stopped application' do
-        operation.manage_application('STOP', 'test_org', 'test_space', 'test')
+        cc_apps_stop_to_start_stub(config)
         expect { operation.manage_application('START', 'test_org', 'test_space', 'test') }.to change { cc.applications['items'][0]['state'] }.from('STOPPED').to('STARTED')
       end
 
@@ -57,6 +58,7 @@ describe AdminUI::Operation, :type => :integration do
 
   context 'manage route' do
     it 'deletes specific route' do
+      cc_routes_delete_stub(config)
       expect { operation.manage_route('DELETE', 'test_host.test_domain') }.to change { cc.routes['items'].length }.from(1).to(0)
     end
   end

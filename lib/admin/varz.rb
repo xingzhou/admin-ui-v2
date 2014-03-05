@@ -48,15 +48,6 @@ module AdminUI
       filter(/Router/)
     end
 
-    def refresh
-      cache = discover_nats
-
-      @semaphore.synchronize do
-        @cache = cache
-        @condition.broadcast
-      end
-    end
-
     def reload
       @semaphore.synchronize do
         @cache = nil

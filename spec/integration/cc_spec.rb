@@ -26,7 +26,8 @@ describe AdminUI::CC, :type => :integration do
 
   context 'Stubbed HTTP' do
     it "refreshes the application's state" do
-      expect { cc.refresh_application_state(cc_stopped_app) }.to change { cc.applications['items'][0]['state'] }.from('STARTED').to('STOPPED')
+      cc_apps_start_to_stop_stub(config)
+      expect { cc.refresh_applications }.to change { cc.applications['items'][0]['state'] }.from('STARTED').to('STOPPED')
     end
 
     it "refreshes the service plan's visibility state" do
@@ -34,7 +35,8 @@ describe AdminUI::CC, :type => :integration do
     end
 
     it 'removes the deleted route' do
-      expect { cc.remove_route_from_cache('test_host.test_domain') }.to change { cc.routes['items'].length }.from(1).to(0)
+      cc_routes_delete_stub(config)
+      expect { cc.refresh_routes }.to change { cc.routes['items'].length }.from(1).to(0)
     end
 
     it 'returns connected applications' do
@@ -43,7 +45,7 @@ describe AdminUI::CC, :type => :integration do
       expect(applications['connected']).to eq(true)
       items = applications['items']
 
-      resources = cc_apps['resources']
+      resources = cc_started_apps['resources']
 
       expect(items.length).to be(resources.length)
 
@@ -53,15 +55,15 @@ describe AdminUI::CC, :type => :integration do
     end
 
     it 'returns applications_count' do
-      expect(cc.applications_count).to be(cc_apps['resources'].length)
+      expect(cc.applications_count).to be(cc_started_apps['resources'].length)
     end
 
     it 'returns applications_running_instances' do
-      expect(cc.applications_running_instances).to be(cc_apps['resources'].length)
+      expect(cc.applications_running_instances).to be(cc_started_apps['resources'].length)
     end
 
     it 'returns applications_total_instances' do
-      expect(cc.applications_total_instances).to be(cc_apps['resources'].length)
+      expect(cc.applications_total_instances).to be(cc_started_apps['resources'].length)
     end
 
     it 'returns connected organizations' do

@@ -288,15 +288,15 @@ describe AdminUI::Admin do
   context 'Login required, but not performed' do
     let(:http) { create_http }
 
-    def redirects_as_expected(path)
+    def get_redirects_as_expected(path)
       do_redirect_request(Net::HTTP::Get.new(path))
     end
 
-    def redirects_as_expected_4_put(path)
+    def put_redirects_as_expected(path)
       do_redirect_request(Net::HTTP::Put.new(path))
     end
 
-    def redirects_as_expected_4_delete(path)
+    def delete_redirects_as_expected(path)
       do_redirect_request(Net::HTTP::Delete.new(path))
     end
 
@@ -311,119 +311,119 @@ describe AdminUI::Admin do
     end
 
     it '/applications redirects as expected' do
-      redirects_as_expected('/applications')
+      get_redirects_as_expected('/applications')
     end
 
     it '/cloud_controllers redirects as expected' do
-      redirects_as_expected('/cloud_controllers')
+      get_redirects_as_expected('/cloud_controllers')
     end
 
     it '/components redirects as expected' do
-      redirects_as_expected('/components')
+      get_redirects_as_expected('/components')
     end
 
     it '/deas redirects as expected' do
-      redirects_as_expected('/deas')
+      get_redirects_as_expected('/deas')
     end
 
     it '/download redirects as expected' do
-      redirects_as_expected('/download')
+      get_redirects_as_expected('/download')
     end
 
     it '/gateways redirects as expected' do
-      redirects_as_expected('/gateways')
+      get_redirects_as_expected('/gateways')
     end
 
     it '/health_managers redirects as expected' do
-      redirects_as_expected('/health_managers')
+      get_redirects_as_expected('/health_managers')
     end
 
     it '/log redirects as expected' do
-      redirects_as_expected('/log')
+      get_redirects_as_expected('/log')
     end
 
     it '/logs redirects as expected' do
-      redirects_as_expected('/logs')
+      get_redirects_as_expected('/logs')
     end
 
     it '/organizations redirects as expected' do
-      redirects_as_expected('/organizations')
+      get_redirects_as_expected('/organizations')
     end
 
     it '/routers redirects as expected' do
-      redirects_as_expected('/routers')
+      get_redirects_as_expected('/routers')
     end
 
     it '/routes redirects as expected' do
-      redirects_as_expected('/routes')
+      get_redirects_as_expected('/routes')
     end
 
     it '/settings redirects as expected' do
-      redirects_as_expected('/settings')
+      get_redirects_as_expected('/settings')
     end
 
     it '/services redirects as expected' do
-      redirects_as_expected('/services')
+      get_redirects_as_expected('/services')
     end
 
     it '/service_bindings redirects as expected' do
-      redirects_as_expected('/service_bindings')
+      get_redirects_as_expected('/service_bindings')
     end
 
     it '/service_instances redirects as expected' do
-      redirects_as_expected('/service_instances')
+      get_redirects_as_expected('/service_instances')
     end
 
     it '/service_plans redirects as expected' do
-      redirects_as_expected('/service_plans')
+      get_redirects_as_expected('/service_plans')
     end
 
     it '/spaces redirects as expected' do
-      redirects_as_expected('/spaces')
+      get_redirects_as_expected('/spaces')
     end
 
     it '/spaces_auditors redirects as expected' do
-      redirects_as_expected('/spaces_auditors')
+      get_redirects_as_expected('/spaces_auditors')
     end
 
     it '/spaces_developers redirects as expected' do
-      redirects_as_expected('/spaces_developers')
+      get_redirects_as_expected('/spaces_developers')
     end
 
     it '/spaces_managersd redirects as expected' do
-      redirects_as_expected('/spaces_managers')
+      get_redirects_as_expected('/spaces_managers')
     end
 
     it '/tasks redirects as expected' do
-      redirects_as_expected('/tasks')
+      get_redirects_as_expected('/tasks')
     end
 
     it '/task_status redirects as expected' do
-      redirects_as_expected('/task_status')
+      get_redirects_as_expected('/task_status')
     end
 
     it '/users redirects as expected' do
-      redirects_as_expected('/users')
+      get_redirects_as_expected('/users')
     end
 
     it 'deletes /route redirects as expected' do
-      redirects_as_expected_4_delete('/route?route=hello.10.244.0.34.xip.io')
+      delete_redirects_as_expected('/route?route=hello.10.244.0.34.xip.io')
     end
 
     it 'puts /restart_application redirects as expected' do
-      redirects_as_expected_4_put('/restart_application?app=ibm/dev/hello')
+      put_redirects_as_expected('/restart_application?app=ibm/dev/hello')
     end
 
     it 'puts /start_application redirects as expected' do
-      redirects_as_expected_4_put('/start_application?app=ibm/dev/hello')
+      put_redirects_as_expected('/start_application?app=ibm/dev/hello')
     end
 
     it 'puts /stop_application redirects as expected' do
-      redirects_as_expected_4_put('/stop_application?app=ibm/dev/hello')
+      put_redirects_as_expected('/stop_application?app=ibm/dev/hello')
     end
 
     it 'puts /turn_service_2_public redirects as expected' do
-      redirects_as_expected_4_put('/turn_service_2_public?service_guid=service1')
+      put_redirects_as_expected('/turn_service_2_public?service_guid=service1')
     end
 
   end

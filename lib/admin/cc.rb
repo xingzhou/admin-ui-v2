@@ -54,19 +54,12 @@ module AdminUI
       organizations['items'].length
     end
 
-    def refresh_application_state(app)
+    def refresh_applications
       hash = @caches[:applications]
       hash[:semaphore].synchronize do
+        hash[:result] = nil
+        hash[:condition].broadcast
         hash[:condition].wait(hash[:semaphore]) while hash[:result].nil?
-        result = hash[:result]
-        apps = result['items']
-
-        apps.each do |cached_app|
-          if cached_app['guid'] == app['metadata']['guid']
-            cached_app['state'] = app['entity']['state']
-            break
-          end
-        end
       end
     end
 
@@ -86,19 +79,12 @@ module AdminUI
       end
     end
 
-    def remove_route_from_cache(route)
+    def refresh_routes
       hash = @caches[:routes]
       hash[:semaphore].synchronize do
+        hash[:result] = nil
+        hash[:condition].broadcast
         hash[:condition].wait(hash[:semaphore]) while hash[:result].nil?
-        result = hash[:result]
-        routes = result['items']
-
-        routes.each do |cached_route|
-          if route == cached_route['host'] + '.' + cached_route['domain']['entity']['name']
-            routes.delete(cached_route)
-            break
-          end
-        end
       end
     end
 
