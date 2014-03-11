@@ -12,7 +12,6 @@ end
 shared_context :web_context do
   let(:stat_date) { 1_383_238_113_597 }
   let(:stat_count) { 1 }
-  531ea0a9-cd95-4c39-aa49-062aa796447b
   before do
     @driver = Selenium::WebDriver.for(:remote, url => 'http://xingzhou:531ea0a9-cd95-4c39-aa49-062aa796447b@localhost:8071') #:firefox
     @driver.manage.timeouts.implicit_wait = 5
