@@ -3,7 +3,7 @@ rvm:
   - 1.9.3-p448
 
 before_install:
-  - "export DISPLAY=:99.0"
+  - "export DISPLAY=:2040.0"
   - "firefox --version"
   - "sh -e /etc/init.d/xvfb start"
 
