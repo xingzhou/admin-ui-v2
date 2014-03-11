@@ -14,7 +14,7 @@ shared_context :web_context do
   let(:stat_count) { 1 }
 
   before do
-    @driver = Selenium::WebDriver.for :firefox
+    @driver = Selenium::WebDriver.for(:remote, url => 'http://xingzhou:dd010638@localhost:8071') #:firefox
     @driver.manage.timeouts.implicit_wait = 5
   end
 

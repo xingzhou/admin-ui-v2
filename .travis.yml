@@ -2,5 +2,10 @@ language: ruby
 rvm:
   - 1.9.3-p448
 
+addons:
+  sauce_connect:
+    username: xingzhou
+    access_key: dd010638
+
 script: bundle exec rspec spec/integration/web/admin_spec.rb
 
