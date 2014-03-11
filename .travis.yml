@@ -7,5 +7,5 @@ before_install:
   - "firefox --version"
   - "sh -e /etc/init.d/xvfb start"
 
-script: sudo bundle exec rspec spec/integration/web/admin_spec.rb
+script: bundle exec rspec spec/integration/web/admin_spec.rb
 
