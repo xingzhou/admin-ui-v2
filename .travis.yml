@@ -3,8 +3,8 @@ rvm:
   - 1.9.3-p448
 
 before_install:
-  - "export DISPLAY=:2040.0"
+  - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
 
-script: bundle exec rspec spec/integration/web/admin_spec.rb
+script: sudo bundle exec rspec spec/integration/web/admin_spec.rb
 
