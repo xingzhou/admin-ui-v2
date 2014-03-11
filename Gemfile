@@ -9,6 +9,5 @@ gem 'net-sftp', '2.1.2'
 
 group :test do
   gem 'rspec'
-  gem 'zip'
-  gem 'selenium-webdriver','2.31.0'
+  gem 'selenium-webdriver','~>2.39.0'
 end
