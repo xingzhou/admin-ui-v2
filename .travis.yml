@@ -4,6 +4,7 @@ rvm:
 
 before_install:
   - "export DISPLAY=:99.0"
+  - "firefox --version"
   - "sh -e /etc/init.d/xvfb start"
 
 script: sudo bundle exec rspec spec/integration/web/admin_spec.rb
