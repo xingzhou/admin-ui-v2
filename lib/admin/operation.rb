@@ -26,7 +26,7 @@ module AdminUI
 
     def manage_route(method, route)
       url = find_route_url(route)
-      puts '******' + url.inspect + '/' + route
+
       if method.upcase == 'DELETE'
         @client.delete_cc(url)
         @cc.refresh_routes
@@ -78,7 +78,7 @@ module AdminUI
 
     def find_route_url(route)
       routes = @cc.routes
-      puts '((((((' + routes.inspect
+
       routes['items'].each do |item|
         if route == item['host'] + '.' + item['domain']['entity']['name']
           return "v2/routes/#{ item['guid'] }"
