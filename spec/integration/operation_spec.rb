@@ -61,8 +61,11 @@ describe AdminUI::Operation, :type => :integration do
   end
 
   context 'manage route' do
+    before do
+      expect(cc.routes['items'].length).to eq(1)
+    end
     it 'deletes specific route' do
-      cc_routes_delete_stub(config)
+      cc_empty_routes_stub(config)
       expect { operation.manage_route('DELETE', 'test_host.test_domain') }.to change { cc.routes['items'].length }.from(1).to(0)
     end
   end
