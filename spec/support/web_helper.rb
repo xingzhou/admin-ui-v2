@@ -32,7 +32,7 @@ shared_context :web_context do
 
     caps = Selenium::WebDriver::Remote::Capabilities.new(
         :browser_name       => 'firefox',
-        build               => build_number,
+        :build              => build_number,
         'tunnel-identifier' => tunnel_identifier)
 
     url = "http://#{ username }:#{ access_key }@localhost:4445/wd/hub"
