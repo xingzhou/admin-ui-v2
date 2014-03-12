@@ -39,13 +39,17 @@ describe AdminUI::Operation, :type => :integration do
 
   context 'Stubbed HTTP' do
     context 'manage application' do
+      before do
+        expect(cc.applications['items'][0]['state']).to eq('STARTED')
+      end
       it 'stops the running application' do
-        cc_apps_start_to_stop_stub(config)
+        cc_stopped_apps_stub(config)
         expect { operation.manage_application('STOP', 'test_org', 'test_space', 'test') }.to change { cc.applications['items'][0]['state'] }.from('STARTED').to('STOPPED')
       end
 
       it 'starts the stopped application' do
         cc_apps_stop_to_start_stub(config)
+        operation.manage_application('STOP', 'test_org', 'test_space', 'test')
         expect { operation.manage_application('START', 'test_org', 'test_space', 'test') }.to change { cc.applications['items'][0]['state'] }.from('STOPPED').to('STARTED')
       end
 

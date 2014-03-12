@@ -7,5 +7,5 @@ addons:
     username: "xingzhou"
     access_key: "531ea0a9-cd95-4c39-aa49-062aa796447b"
 
-script: bundle exec rspec
+script: bundle exec rspec spec/integration/operation_spec.rb
 
