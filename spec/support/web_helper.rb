@@ -13,7 +13,8 @@ shared_context :web_context do
   let(:stat_date) { 1_383_238_113_597 }
   let(:stat_count) { 1 }
   before do
-    @driver = Selenium::WebDriver.for :firefox#(:remote, :url => 'http://xingzhou:531ea0a9-cd95-4c39-aa49-062aa796447b@localhost:4445/wd/hub') #:firefox
+    caps = Selenium::WebDriver::Remote::Capabilities.new('tunnel-identifier' => ENV['TRAVIS_JOB_NUMBER'], :browser => 'firefox')
+    @driver = Selenium::WebDriver.for(:remote, :desired_capabilities => caps)#:url => 'http://xingzhou:531ea0a9-cd95-4c39-aa49-062aa796447b@localhost:4445/wd/hub') #:firefox
     @driver.manage.timeouts.implicit_wait = 5
   end
 
