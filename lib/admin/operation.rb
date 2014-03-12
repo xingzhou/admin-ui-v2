@@ -26,7 +26,7 @@ module AdminUI
 
     def manage_route(method, route)
       url = find_route_url(route)
-
+      puts '******' + url + '/' + route
       if method.upcase == 'DELETE'
         @client.delete_cc(url)
         @cc.refresh_routes
