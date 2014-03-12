@@ -50,7 +50,7 @@ describe AdminUI::Admin, :type => :integration, :firefox_available => true do
       before do
         @driver.find_element(:id => tab_id).click
         Selenium::WebDriver::Wait.new(:timeout => 5).until { @driver.find_element(:class_name => 'menuItemSelected').attribute('id') == tab_id }
-        # Enforce the page is displayed
+        # Enforce that the page is displayed
         Selenium::WebDriver::Wait.new(:timeout => 5).until { @driver.find_element(:id => "#{ tab_id }Page").displayed? }
       end
 
