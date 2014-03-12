@@ -286,7 +286,7 @@ describe AdminUI::Admin, :type => :integration, :firefox_available => true do
             # error happens.
             Selenium::WebDriver::Wait.new(:timeout => 5).until do
               begin
-                expect(@driver.find_element(:xpath => "//table[@id='ApplicationsTable']/tbody/tr/td[3]").text).to eq(expect_state)
+                @driver.find_element(:xpath => "//table[@id='ApplicationsTable']/tbody/tr/td[3]").text == expect_state
               rescue
                 expect(@driver.find_element(:xpath => "//table[@id='ApplicationsTable']/tbody/tr/td[3]").text).to eq(expect_state)
               end
