@@ -27,7 +27,7 @@ describe AdminUI::Operation, :type => :integration do
     operation_stub(config)
   end
 
-  let(:cc) { puts 'dongdong haobng';AdminUI::CC.new(config, logger, client) }
+  let(:cc) { AdminUI::CC.new(config, logger, client) }
   let(:email) { AdminUI::EMail.new(config, logger) }
   let(:nats) { AdminUI::NATS.new(config, logger, email) }
   let(:varz) { AdminUI::VARZ.new(config, logger, nats) }
