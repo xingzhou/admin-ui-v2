@@ -25,6 +25,7 @@ describe AdminUI::Operation, :type => :integration do
     nats_stub
     varz_stub
     operation_stub(config)
+    puts "@@@@@@@@@@"
   end
 
   let(:cc) { AdminUI::CC.new(config, logger, client) }
@@ -52,6 +53,7 @@ describe AdminUI::Operation, :type => :integration do
         cc_apps_stop_to_start_stub(config)
         operation.manage_application('STOP', 'test_org', 'test_space', 'test')
         puts '&&&&&&&&&&' + cc.applications['items'][0]['state']
+
         expect { operation.manage_application('START', 'test_org', 'test_space', 'test') }.to change { cc.applications['items'][0]['state'] }.from('STOPPED').to('STARTED')
         puts '^^^^^^^^^^' + cc.applications['items'][0]['state']
       end
