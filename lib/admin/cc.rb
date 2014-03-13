@@ -160,9 +160,8 @@ module AdminUI
       @logger.debug("[#{ @config.cloud_controller_discovery_interval } second interval] Starting CC #{ key_string } discovery...")
 
       result_cache = send("discover_#{ key_string }".to_sym)
-      puts '&&&&&&&&&&schedule_discovery'if key == :applications
+      puts '&&&&&&&&&&schedule_discovery' if(key == :applications)
 
-      end
       hash[:semaphore].synchronize do
         @logger.debug("Caching CC #{ key_string } data...")
         hash[:result] = result_cache
