@@ -58,7 +58,6 @@ module AdminUI
       hash = @caches[:applications]
       hash[:semaphore].synchronize do
         hash[:result] = nil
-        puts '&&&&&&refresh_applications'
         hash[:condition].broadcast
         hash[:condition].wait(hash[:semaphore]) while hash[:result].nil?
       end
@@ -160,7 +159,6 @@ module AdminUI
       @logger.debug("[#{ @config.cloud_controller_discovery_interval } second interval] Starting CC #{ key_string } discovery...")
 
       result_cache = send("discover_#{ key_string }".to_sym)
-      puts '&&&&&&&&&&schedule_discovery' if(key == :applications)
 
       hash[:semaphore].synchronize do
         @logger.debug("Caching CC #{ key_string } data...")
@@ -197,9 +195,7 @@ module AdminUI
       @client.get_cc('v2/apps').each do |app|
         items.push(app['entity'].merge(app['metadata']))
       end
-      puts '!!!!!!!!!' + items.inspect
       result(items)
-
     rescue => error
       @logger.debug("Error during discover_applications: #{ error.inspect }")
       @logger.debug(error.backtrace.join("\n"))

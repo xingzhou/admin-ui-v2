@@ -26,7 +26,7 @@ describe AdminUI::Operation, :type => :integration do
     operation_stub(config)
   end
 
-  let(:cc) { AdminUI::CC.new(config, logger, client) }
+  let(:cc) { puts 'dongdong haobng';AdminUI::CC.new(config, logger, client) }
   let(:email) { AdminUI::EMail.new(config, logger) }
   let(:nats) { AdminUI::NATS.new(config, logger, email) }
   let(:varz) { AdminUI::VARZ.new(config, logger, nats) }
@@ -40,7 +40,6 @@ describe AdminUI::Operation, :type => :integration do
     context 'manage application' do
       before do
         expect(cc.applications['items'][0]['state']).to eq('STARTED')
-        #puts '**********' + cc.applications['items'][0]['state']
       end
       it 'stops the running application' do
         cc_stopped_apps_stub(config)
@@ -48,12 +47,8 @@ describe AdminUI::Operation, :type => :integration do
       end
 
       it 'starts the stopped application' do
-        #cc_stopped_apps_stub(config)
-        #cc.refresh_applications
         cc_apps_stop_to_start_stub(config)
-        operation.manage_application('STOP', 'test_org', 'test_space', 'test')
-        puts '&&&&&&&&&&' + cc.applications['items'][0]['state']
-        #cc_started_apps_stub(config)
+        cc.refresh_applications
         expect { operation.manage_application('START', 'test_org', 'test_space', 'test') }.to change { cc.applications['items'][0]['state'] }.from('STOPPED').to('STARTED')
       end
 
