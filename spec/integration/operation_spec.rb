@@ -41,6 +41,7 @@ describe AdminUI::Operation, :type => :integration do
     context 'manage application' do
       before do
         expect(cc.applications['items'][0]['state']).to eq('STARTED')
+        puts '**********' + cc.applications['items'][0]['state']
       end
       it 'stops the running application' do
         cc_stopped_apps_stub(config)
@@ -50,7 +51,9 @@ describe AdminUI::Operation, :type => :integration do
       it 'starts the stopped application' do
         cc_apps_stop_to_start_stub(config)
         operation.manage_application('STOP', 'test_org', 'test_space', 'test')
+        puts '&&&&&&&&&&' + cc.applications['items'][0]['state']
         expect { operation.manage_application('START', 'test_org', 'test_space', 'test') }.to change { cc.applications['items'][0]['state'] }.from('STOPPED').to('STARTED')
+        puts '^^^^^^^^^^' + cc.applications['items'][0]['state']
       end
 
       it 'restarts the application' do
