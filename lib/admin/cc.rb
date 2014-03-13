@@ -195,7 +195,9 @@ module AdminUI
       @client.get_cc('v2/apps').each do |app|
         items.push(app['entity'].merge(app['metadata']))
       end
+      puts '!!!!!!!!!' + items.inspect
       result(items)
+
     rescue => error
       @logger.debug("Error during discover_applications: #{ error.inspect }")
       @logger.debug(error.backtrace.join("\n"))
