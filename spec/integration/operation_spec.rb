@@ -46,7 +46,7 @@ describe AdminUI::Operation, :type => :integration do
         cc_stopped_apps_stub(config)
         expect { operation.manage_application('STOP', 'test_org', 'test_space', 'test') }.to change { cc.applications['items'][0]['state'] }.from('STARTED').to('STOPPED')
       end
-
+      # ?
       it 'starts the stopped application' do
         cc_apps_stop_to_start_stub(config)
         cc.refresh_applications
