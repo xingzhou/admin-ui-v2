@@ -283,7 +283,7 @@ describe AdminUI::Admin, :type => :integration, :firefox_available => true do
 
           def check_app_state(expect_state)
             # As the UI table will be refreshed and recreated, add a try-catch block in case the selenium stale element
-            # error happens. Do not use expect in the block body.
+            # error happens. Do not use expect in the block body...
             Selenium::WebDriver::Wait.new(:timeout => 5).until do
               begin
                 @driver.find_element(:xpath => "//table[@id='ApplicationsTable']/tbody/tr/td[3]").text == expect_state
