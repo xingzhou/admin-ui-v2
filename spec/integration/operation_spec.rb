@@ -55,7 +55,6 @@ describe AdminUI::Operation, :type => :integration do
         puts '&&&&&&&&&&' + cc.applications['items'][0]['state']
         #cc_started_apps_stub(config)
         expect { operation.manage_application('START', 'test_org', 'test_space', 'test') }.to change { cc.applications['items'][0]['state'] }.from('STOPPED').to('STARTED')
-        puts '^^^^^^^^^^' + cc.applications['items'][0]['state']
       end
 
       it 'restarts the application' do
