@@ -58,6 +58,7 @@ module AdminUI
       hash = @caches[:applications]
       hash[:semaphore].synchronize do
         hash[:result] = nil
+        puts '&&&&&&refresh_applications'
         hash[:condition].broadcast
         hash[:condition].wait(hash[:semaphore]) while hash[:result].nil?
       end
@@ -159,7 +160,9 @@ module AdminUI
       @logger.debug("[#{ @config.cloud_controller_discovery_interval } second interval] Starting CC #{ key_string } discovery...")
 
       result_cache = send("discover_#{ key_string }".to_sym)
+      puts '&&&&&&&&&&schedule_discovery'if key == :applications
 
+      end
       hash[:semaphore].synchronize do
         @logger.debug("Caching CC #{ key_string } data...")
         hash[:result] = result_cache
