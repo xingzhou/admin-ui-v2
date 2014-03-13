@@ -11,8 +11,7 @@ describe AdminUI::Operation, :type => :integration do
   let(:log_file) { '/tmp/admin_ui.log' }
   let(:logger) { Logger.new(log_file) }
   let(:config) do
-    AdminUI::Config.load(:cloud_controller_discovery_interval => 10,
-                         :cloud_controller_uri                => 'http://api.cloudfoundry',
+    AdminUI::Config.load(:cloud_controller_uri                => 'http://api.cloudfoundry',
                          :data_file                           => data_file,
                          :monitored_components                => [],
                          :uaa_admin_credentials               => { :username => 'user', :password => 'password' })
@@ -50,10 +49,10 @@ describe AdminUI::Operation, :type => :integration do
       end
 
       it 'starts the stopped application' do
-        cc_apps_stop_to_start_stub(config)
-        operation.manage_application('STOP', 'test_org', 'test_space', 'test')
+        cc_stopped_apps_stub(config)
+        cc.refresh_applications
         puts '&&&&&&&&&&' + cc.applications['items'][0]['state']
-
+        cc_started_apps_stub(config)
         expect { operation.manage_application('START', 'test_org', 'test_space', 'test') }.to change { cc.applications['items'][0]['state'] }.from('STOPPED').to('STARTED')
         puts '^^^^^^^^^^' + cc.applications['items'][0]['state']
       end
