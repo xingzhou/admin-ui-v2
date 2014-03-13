@@ -204,7 +204,6 @@ module CCHelper
   end
 
   def cc_started_app
-    puts "###########"
     {
         'metadata' =>
             {
@@ -226,7 +225,6 @@ module CCHelper
   end
 
   def cc_stopped_app
-    puts '%%%%%%%%%%%%%%%'
     {
         'metadata' =>
             {
