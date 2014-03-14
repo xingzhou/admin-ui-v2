@@ -25,8 +25,10 @@ describe AdminUI::CC, :type => :integration do
   end
 
   context 'Stubbed HTTP' do
+    before do
+      expect(cc.applications['items'][0]['state']).to eq('STARTED')
+    end
     it "refreshes the application's state" do
-      cc.applications
       cc_stopped_apps_stub(config)
       expect { cc.refresh_applications }.to change { cc.applications['items'][0]['state'] }.from('STARTED').to('STOPPED')
     end
