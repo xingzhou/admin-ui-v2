@@ -39,7 +39,7 @@ describe AdminUI::CC, :type => :integration do
 
     it 'removes the deleted route' do
       expect(cc.routes['items'].length).to eq(1)
-      cc_routes_delete_stub(config)
+      cc_empty_routes_stub(config)
       expect { cc.refresh_routes }.to change { cc.routes['items'].length }.from(1).to(0)
     end
 
