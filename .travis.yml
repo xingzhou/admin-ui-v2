@@ -4,8 +4,8 @@ rvm:
 
 addons:
   sauce_connect:
-    username: "xingzhou"
-    access_key: "531ea0a9-cd95-4c39-aa49-062aa796447b"
+    username: "xingzhou-github"
+    access_key: "b4d226f4-9ac2-4fcb-a1ab-8b10e042ef98"
 
 script: bundle exec rspec spec
 
