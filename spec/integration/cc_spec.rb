@@ -7,7 +7,7 @@ describe AdminUI::CC, :type => :integration do
   let(:log_file) { '/tmp/admin_ui.log' }
   let(:logger) { Logger.new(log_file) }
   let(:config) do
-    AdminUI::Config.load(:cloud_controller_discovery_interval => 1,
+    AdminUI::Config.load(:cloud_controller_discovery_interval => 10,
                          :cloud_controller_uri                => 'http://api.cloudfoundry',
                          :uaa_admin_credentials               => { :username => 'user', :password => 'password' })
   end
@@ -26,7 +26,8 @@ describe AdminUI::CC, :type => :integration do
 
   context 'Stubbed HTTP' do
     it "refreshes the application's state" do
-      cc_apps_start_to_stop_stub(config)
+      cc.applications
+      cc_stopped_apps_stub(config)
       expect { cc.refresh_applications }.to change { cc.applications['items'][0]['state'] }.from('STARTED').to('STOPPED')
     end
 
