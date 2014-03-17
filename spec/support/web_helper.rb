@@ -14,12 +14,30 @@ shared_context :web_context do
   let(:stat_count) { 1 }
 
   before do
-    @driver = Selenium::WebDriver.for :firefox
+    @driver = get_selenium_web_driver
     @driver.manage.timeouts.implicit_wait = 5
   end
 
   after do
     @driver.quit
+  end
+
+  def get_selenium_web_driver
+    return  Selenium::WebDriver.for(:firefox) unless ENV['TRAVIS']
+
+    access_key        = ENV['SAUCE_ACCESS_KEY']
+    build_number      = ENV['TRAVIS_BUILD_NUMBER']
+    tunnel_identifier = ENV['TRAVIS_JOB_NUMBER']
+    username          = ENV['SAUCE_USERNAME']
+
+    caps = Selenium::WebDriver::Remote::Capabilities.new(
+        :browser_name       => 'firefox',
+        :build              => build_number,
+        'tunnel-identifier' => tunnel_identifier)
+
+    url = "http://#{ username }:#{ access_key }@localhost:4445/wd/hub"
+
+    Selenium::WebDriver.for(:remote, :desired_capabilities => caps, :url => url)
   end
 
   def add_stats

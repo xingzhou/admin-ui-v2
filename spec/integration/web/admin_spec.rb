@@ -49,7 +49,8 @@ describe AdminUI::Admin, :type => :integration, :firefox_available => true do
       before do
         @driver.find_element(:id => tab_id).click
         Selenium::WebDriver::Wait.new(:timeout => 5).until { @driver.find_element(:class_name => 'menuItemSelected').attribute('id') == tab_id }
-        expect(@driver.find_element(:id => "#{ tab_id }Page").displayed?).to be_true
+        # Enforce that the page is displayed
+        Selenium::WebDriver::Wait.new(:timeout => 5).until { @driver.find_element(:id => "#{ tab_id }Page").displayed? }
       end
 
       context 'Organizations' do
@@ -830,7 +831,11 @@ describe AdminUI::Admin, :type => :integration, :firefox_available => true do
           @driver.find_element(:id => 'ToolTables_StatsTable_0').click
           date = @driver.find_element(:xpath => "//span[@id='DialogText']/span").text
           @driver.find_element(:id => 'DialogOkayButton').click
-          Selenium::WebDriver::Wait.new(:timeout => 5).until { @driver.find_element(:xpath => "//table[@id='StatsTable']/tbody/tr").text != 'No data available in table' }
+          begin
+            Selenium::WebDriver::Wait.new(:timeout => 5).until { @driver.find_element(:xpath => "//table[@id='StatsTable']/tbody/tr").text != 'No data available in table' }
+          rescue
+              expect(@driver.find_element(:xpath => "//table[@id='StatsTable']/tbody/tr").text).should_not eq('No data available in table')
+          end
           check_table_data(@driver.find_elements(:xpath => "//table[@id='StatsTable']/tbody/tr/td"), [date, '1', '1', '1', '1', '1', '1', '1'])
         end
       end
