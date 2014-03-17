@@ -2,14 +2,13 @@ require 'sinatra'
 
 module AdminUI
   class Web < Sinatra::Base
-    def initialize(config, logger, cc, log_files, operation, stats, tasks, varz)
+    def initialize(config, logger, cc, log_files, stats, tasks, varz)
       super({})
 
       @config    = config
       @logger    = logger
       @cc        = cc
       @log_files = log_files
-      @operation = operation
       @stats     = stats
       @tasks     = tasks
       @varz      = varz
@@ -94,10 +93,6 @@ module AdminUI
 
     get '/routers', :auth => [:user] do
       @varz.routers.to_json
-    end
-
-    get '/routes', :auth => [:user] do
-      @cc.routes.to_json
     end
 
     get '/settings', :auth => [:user] do
@@ -206,40 +201,8 @@ module AdminUI
 
     end
 
-    put '/restart_application',  :auth => [:admin] do
-      manage_application('RESTART', params)
-    end
-
-    put '/start_application', :auth => [:admin] do
-      manage_application('START', params)
-    end
-
-    put '/stop_application', :auth => [:admin] do
-      manage_application('STOP', params)
-    end
-
-    put '/turn_service_2_public', :auth => [:admin] do
-      service_guid = params['service_guid']
-
-      return 400 unless service_guid
-
-      @operation.manage_service('TURN_PUBLIC', service_guid)
-
-      204
-    end
-
     delete '/components', :auth => [:user] do
       @varz.remove(params['uri'])
-
-      204
-    end
-
-    delete '/route', :auth => [:admin] do
-      route = params['route']
-
-      return 400 unless route
-
-      @operation.manage_route('DELETE', route)
 
       204
     end
@@ -263,20 +226,6 @@ module AdminUI
       else
         redirect 'login.html', 303
       end
-    end
-
-    def manage_application(method, params)
-      app_string = params['app']
-
-      return 400 unless app_string
-
-      array = app_string.split('/')
-
-      return 400 unless array.length == 3
-
-      @operation.manage_application(method, array[0], array[1], array[2])
-
-      204
     end
   end
 end

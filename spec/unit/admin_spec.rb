@@ -107,21 +107,6 @@ describe AdminUI::Admin do
       JSON.parse(body)
     end
 
-    def put(path)
-      request = Net::HTTP::Put.new(path)
-      request['Cookie'] = cookie
-      request['Content-Length'] = 0
-
-      http.request(request)
-    end
-
-    def delete(path)
-      request = Net::HTTP::Delete.new(path)
-      request['Cookie'] = cookie
-
-      http.request(request)
-    end
-
     def verify_disconnected_items(path)
       json = get_json(path)
 
@@ -132,66 +117,6 @@ describe AdminUI::Admin do
       json = get_json(path)
 
       expect(json).to include('items' => [])
-    end
-
-    context 'delete route' do
-      it 'returns 400 when the param is not valid' do
-        response = delete('/route')
-        expect(response.is_a?(Net::HTTPBadRequest)).to be_true
-      end
-
-      it 'returns failure code due to disconnection' do
-        response = delete('/route?route=hello.10.244.0.34.xip.io')
-        expect(response.is_a?(Net::HTTPInternalServerError)).to be_true
-      end
-    end
-
-    context 'restart application' do
-      it 'returns 400 when the param is not valid' do
-        response = put('/restart_application?app=foo')
-        expect(response.is_a?(Net::HTTPBadRequest)).to be_true
-      end
-
-      it 'returns failure code due to disconnection' do
-        response = put('/restart_application?app=ibm/dev/hello')
-        expect(response.is_a?(Net::HTTPInternalServerError)).to be_true
-      end
-    end
-
-    context 'start application' do
-      it 'returns 400 when the param is not valid' do
-        response = put('/start_application?app=foo')
-        expect(response.is_a?(Net::HTTPBadRequest)).to be_true
-      end
-
-      it 'returns failure code due to disconnection' do
-        response = put('/start_application?app=ibm/dev/hello')
-        expect(response.is_a?(Net::HTTPInternalServerError)).to be_true
-      end
-    end
-
-    context 'stop application' do
-      it 'returns 400 when the param is not valid' do
-        response = put('/stop_application?app=foo')
-        expect(response.is_a?(Net::HTTPBadRequest)).to be_true
-      end
-
-      it 'returns failure code due to disconnection' do
-        response = put('/stop_application?app=ibm/dev/hello')
-        expect(response.is_a?(Net::HTTPInternalServerError)).to be_true
-      end
-    end
-
-    context 'turn service to public' do
-      it 'returns 400 when the param is not valid' do
-        response = put('/turn_service_2_public')
-        expect(response.is_a?(Net::HTTPBadRequest)).to be_true
-      end
-
-      it 'returns failure code due to disconnection' do
-        response = put('/turn_service_2_public?service_guid=service1')
-        expect(response.is_a?(Net::HTTPNoContent)).to be_true
-      end
     end
 
     it '/applications succeeds' do
@@ -224,10 +149,6 @@ describe AdminUI::Admin do
 
     it '/organizations succeeds' do
       verify_disconnected_items('/organizations')
-    end
-
-    it '/routes succeeds' do
-      verify_disconnected_items('/routes')
     end
 
     it '/routers succeeds' do
@@ -288,20 +209,8 @@ describe AdminUI::Admin do
   context 'Login required, but not performed' do
     let(:http) { create_http }
 
-    def get_redirects_as_expected(path)
-      do_redirect_request(Net::HTTP::Get.new(path))
-    end
-
-    def put_redirects_as_expected(path)
-      do_redirect_request(Net::HTTP::Put.new(path))
-    end
-
-    def delete_redirects_as_expected(path)
-      do_redirect_request(Net::HTTP::Delete.new(path))
-    end
-
-    def do_redirect_request(request)
-      request['Content-Length'] = 0
+    def redirects_as_expected(path)
+      request = Net::HTTP::Get.new(path)
 
       response = http.request(request)
       expect(response.is_a?(Net::HTTPSeeOther)).to be_true
@@ -311,119 +220,95 @@ describe AdminUI::Admin do
     end
 
     it '/applications redirects as expected' do
-      get_redirects_as_expected('/applications')
+      redirects_as_expected('/applications')
     end
 
     it '/cloud_controllers redirects as expected' do
-      get_redirects_as_expected('/cloud_controllers')
+      redirects_as_expected('/cloud_controllers')
     end
 
     it '/components redirects as expected' do
-      get_redirects_as_expected('/components')
+      redirects_as_expected('/components')
     end
 
     it '/deas redirects as expected' do
-      get_redirects_as_expected('/deas')
+      redirects_as_expected('/deas')
     end
 
     it '/download redirects as expected' do
-      get_redirects_as_expected('/download')
+      redirects_as_expected('/download')
     end
 
     it '/gateways redirects as expected' do
-      get_redirects_as_expected('/gateways')
+      redirects_as_expected('/gateways')
     end
 
     it '/health_managers redirects as expected' do
-      get_redirects_as_expected('/health_managers')
+      redirects_as_expected('/health_managers')
     end
 
     it '/log redirects as expected' do
-      get_redirects_as_expected('/log')
+      redirects_as_expected('/log')
     end
 
     it '/logs redirects as expected' do
-      get_redirects_as_expected('/logs')
+      redirects_as_expected('/logs')
     end
 
     it '/organizations redirects as expected' do
-      get_redirects_as_expected('/organizations')
+      redirects_as_expected('/organizations')
     end
 
     it '/routers redirects as expected' do
-      get_redirects_as_expected('/routers')
-    end
-
-    it '/routes redirects as expected' do
-      get_redirects_as_expected('/routes')
+      redirects_as_expected('/routers')
     end
 
     it '/settings redirects as expected' do
-      get_redirects_as_expected('/settings')
+      redirects_as_expected('/settings')
     end
 
     it '/services redirects as expected' do
-      get_redirects_as_expected('/services')
+      redirects_as_expected('/services')
     end
 
     it '/service_bindings redirects as expected' do
-      get_redirects_as_expected('/service_bindings')
+      redirects_as_expected('/service_bindings')
     end
 
     it '/service_instances redirects as expected' do
-      get_redirects_as_expected('/service_instances')
+      redirects_as_expected('/service_instances')
     end
 
     it '/service_plans redirects as expected' do
-      get_redirects_as_expected('/service_plans')
+      redirects_as_expected('/service_plans')
     end
 
     it '/spaces redirects as expected' do
-      get_redirects_as_expected('/spaces')
+      redirects_as_expected('/spaces')
     end
 
     it '/spaces_auditors redirects as expected' do
-      get_redirects_as_expected('/spaces_auditors')
+      redirects_as_expected('/spaces_auditors')
     end
 
     it '/spaces_developers redirects as expected' do
-      get_redirects_as_expected('/spaces_developers')
+      redirects_as_expected('/spaces_developers')
     end
 
     it '/spaces_managersd redirects as expected' do
-      get_redirects_as_expected('/spaces_managers')
+      redirects_as_expected('/spaces_managers')
     end
 
     it '/tasks redirects as expected' do
-      get_redirects_as_expected('/tasks')
+      redirects_as_expected('/tasks')
     end
 
     it '/task_status redirects as expected' do
-      get_redirects_as_expected('/task_status')
+      redirects_as_expected('/task_status')
     end
 
     it '/users redirects as expected' do
-      get_redirects_as_expected('/users')
-    end
-
-    it 'deletes /route redirects as expected' do
-      delete_redirects_as_expected('/route?route=hello.10.244.0.34.xip.io')
-    end
-
-    it 'puts /restart_application redirects as expected' do
-      put_redirects_as_expected('/restart_application?app=ibm/dev/hello')
-    end
-
-    it 'puts /start_application redirects as expected' do
-      put_redirects_as_expected('/start_application?app=ibm/dev/hello')
-    end
-
-    it 'puts /stop_application redirects as expected' do
-      put_redirects_as_expected('/stop_application?app=ibm/dev/hello')
-    end
-
-    it 'puts /turn_service_2_public redirects as expected' do
-      put_redirects_as_expected('/turn_service_2_public?service_guid=service1')
+      redirects_as_expected('/users')
     end
 
   end

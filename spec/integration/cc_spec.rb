@@ -7,49 +7,30 @@ describe AdminUI::CC, :type => :integration do
   let(:log_file) { '/tmp/admin_ui.log' }
   let(:logger) { Logger.new(log_file) }
   let(:config) do
-    AdminUI::Config.load(:cloud_controller_discovery_interval => 10,
+    AdminUI::Config.load(:cloud_controller_discovery_interval => 1,
                          :cloud_controller_uri                => 'http://api.cloudfoundry',
                          :uaa_admin_credentials               => { :username => 'user', :password => 'password' })
   end
-  let(:client) { AdminUI::RestClient.new(config, logger) }
 
   before do
     AdminUI::Config.any_instance.stub(:validate)
     cc_stub(config)
   end
 
-  let(:cc) { AdminUI::CC.new(config, logger, client) }
+  let(:cc) { AdminUI::CC.new(config, logger) }
 
   after do
     Process.wait(Process.spawn({}, "rm -fr #{ log_file }"))
   end
 
   context 'Stubbed HTTP' do
-    before do
-      expect(cc.applications['items'][0]['state']).to eq('STARTED')
-    end
-    it "refreshes the application's state" do
-      cc_stopped_apps_stub(config)
-      expect { cc.refresh_applications }.to change { cc.applications['items'][0]['state'] }.from('STARTED').to('STOPPED')
-    end
-
-    it "refreshes the service plan's visibility state" do
-      expect { cc.refresh_service_plan_visibility_state(cc_public_service_plan) }.to change { cc.service_plans['items'][0]['public'] }.from(false).to(true)
-    end
-
-    it 'removes the deleted route' do
-      expect(cc.routes['items'].length).to eq(1)
-      cc_empty_routes_stub(config)
-      expect { cc.refresh_routes }.to change { cc.routes['items'].length }.from(1).to(0)
-    end
-
     it 'returns connected applications' do
       applications = cc.applications
 
       expect(applications['connected']).to eq(true)
       items = applications['items']
 
-      resources = cc_started_apps['resources']
+      resources = cc_apps['resources']
 
       expect(items.length).to be(resources.length)
 
@@ -59,15 +40,15 @@ describe AdminUI::CC, :type => :integration do
     end
 
     it 'returns applications_count' do
-      expect(cc.applications_count).to be(cc_started_apps['resources'].length)
+      expect(cc.applications_count).to be(cc_apps['resources'].length)
     end
 
     it 'returns applications_running_instances' do
-      expect(cc.applications_running_instances).to be(cc_started_apps['resources'].length)
+      expect(cc.applications_running_instances).to be(cc_apps['resources'].length)
     end
 
     it 'returns applications_total_instances' do
-      expect(cc.applications_total_instances).to be(cc_started_apps['resources'].length)
+      expect(cc.applications_total_instances).to be(cc_apps['resources'].length)
     end
 
     it 'returns connected organizations' do
@@ -77,21 +58,6 @@ describe AdminUI::CC, :type => :integration do
       items = organizations['items']
 
       resources = cc_organizations['resources']
-
-      expect(items.length).to be(resources.length)
-
-      resources.each do |resource|
-        expect(items).to include(resource['entity'].merge(resource['metadata']))
-      end
-    end
-
-    it 'returns connected routes' do
-      routes = cc.routes
-
-      expect(routes['connected']).to eq(true)
-      items = routes['items']
-
-      resources = cc_routes['resources']
 
       expect(items.length).to be(resources.length)
 

@@ -1,11 +1,9 @@
 require 'logger'
 require_relative 'admin/config'
 require_relative 'admin/cc'
-require_relative 'admin/cc_rest_client'
 require_relative 'admin/email'
 require_relative 'admin/log_files'
 require_relative 'admin/nats'
-require_relative 'admin/operation'
 require_relative 'admin/stats'
 require_relative 'admin/tasks'
 require_relative 'admin/varz'
@@ -44,15 +42,13 @@ module AdminUI
     end
 
     def setup_components
-      client = RestClient.new(@config, @logger)
-      email  = EMail.new(@config, @logger)
-      nats   = NATS.new(@config, @logger, email)
+      email = EMail.new(@config, @logger)
+      nats  = NATS.new(@config, @logger, email)
 
-      @cc        = CC.new(@config, @logger, client)
+      @cc        = CC.new(@config, @logger)
       @log_files = LogFiles.new(@config, @logger)
       @tasks     = Tasks.new(@config, @logger)
       @varz      = VARZ.new(@config, @logger, nats)
-      @operation = Operation.new(@config, @logger, @cc, client, @varz)
       @stats     = Stats.new(@config, @logger, @cc, @varz)
     end
 
@@ -70,12 +66,11 @@ module AdminUI
                              @logger,
                              @cc,
                              @log_files,
-                             @operation,
                              @stats,
                              @tasks,
                              @varz)
 
-      Rack::Handler::WEBrick.run(web, :Port => @config.port, AccessLog: [])
+      Rack::Handler::WEBrick.run(web, :Port => @config.port, :BindAddress => @config.bind_address)
     end
   end
 end

@@ -8,8 +8,7 @@ describe AdminUI::CC do
     AdminUI::Config.load(:cloud_controller_uri   => 'http://api.localhost',
                          :uaa_admin_credentials  => { :password => 'c1oudc0w', :username => 'admin' })
   end
-  let(:client) { AdminUI::RestClient.new(config, logger) }
-  let(:cc) { AdminUI::CC.new(config, logger, client) }
+  let(:cc) { AdminUI::CC.new(config, logger) }
 
   before do
     AdminUI::Config.any_instance.stub(:validate)
@@ -47,10 +46,6 @@ describe AdminUI::CC do
 
     it 'returns zero organizations count as expected' do
       expect(cc.organizations_count).to eq(0)
-    end
-
-    it 'returns zero routes as expected' do
-      verify_disconnected_items(cc.routes)
     end
 
     it 'returns zero services as expected' do

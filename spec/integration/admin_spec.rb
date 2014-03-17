@@ -42,93 +42,6 @@ describe AdminUI::Admin, :type => :integration do
     JSON.parse(body)
   end
 
-  def put_request(path)
-    request = Net::HTTP::Put.new(path)
-    request['Cookie'] = cookie
-    request['Content-Length'] = 0
-
-    response = http.request(request)
-
-    response
-  end
-
-  def delete_request(path)
-    request = Net::HTTP::Delete.new(path)
-    request['Cookie'] = cookie
-    request['Content-Length'] = 0
-
-    response = http.request(request)
-
-    response
-  end
-
-  context 'manage application' do
-    let(:http)   { create_http }
-    let(:cookie) { login_and_return_cookie(http) }
-
-    def start_app
-      response = put_request('/start_application?app=test_org/test_space/test')
-      expect(response.is_a?Net::HTTPNoContent).to be_true
-    end
-
-    def stop_app
-      response = put_request('/stop_application?app=test_org/test_space/test')
-      expect(response.is_a?Net::HTTPNoContent).to be_true
-    end
-
-    def restart_app
-      response = put_request('/restart_application?app=test_org/test_space/test')
-      expect(response.is_a?Net::HTTPNoContent).to be_true
-    end
-
-    it 'stops the running application' do
-      cc_stopped_apps_stub(AdminUI::Config.load(config))
-      expect { stop_app }.to change { get_json('/applications')['items'][0]['state'] }.from('STARTED').to('STOPPED')
-    end
-
-    it 'starts the stopped application' do
-      # Make sure the app is in stopped state
-      cc_apps_stop_to_start_stub(AdminUI::Config.load(config))
-      stop_app
-
-      expect { start_app }.to change { get_json('/applications')['items'][0]['state'] }.from('STOPPED').to('STARTED')
-    end
-
-    it 'restarts the application' do
-      restart_app
-      expect(get_json('/applications')['items'][0]['state']).to eq('STARTED')
-    end
-  end
-
-  context 'manage route' do
-    let(:http)   { create_http }
-    let(:cookie) { login_and_return_cookie(http) }
-
-    def delete_route
-      response = delete_request('/route?route=test_host.test_domain')
-      expect(response.is_a?Net::HTTPNoContent).to be_true
-    end
-
-    it 'deletes the specific route' do
-      cc_empty_routes_stub(AdminUI::Config.load(config))
-      expect { delete_route }.to change { get_json('/routes')['items'].length }.from(1).to(0)
-    end
-  end
-
-  context 'manage service' do
-    let(:http)   { create_http }
-    let(:cookie) { login_and_return_cookie(http) }
-
-    def turn_service_2_public
-      response = put_request('/turn_service_2_public?service_guid=service1')
-      expect(response.is_a?Net::HTTPNoContent).to be_true
-    end
-
-    it 'turns service to public' do
-      expect { turn_service_2_public }.to change { get_json('/service_plans')['items'][0]['public'] }.from(false).to(true)
-    end
-  end
-
   context 'retrieves and validates' do
     let(:http)   { create_http }
     let(:cookie) { login_and_return_cookie(http) }
@@ -186,7 +99,7 @@ describe AdminUI::Admin, :type => :integration do
 
     it_behaves_like('retrieves cc entity/metadata record') do
       let(:path)      { '/applications' }
-      let(:cc_source) { cc_started_apps }
+      let(:cc_source) { cc_apps }
     end
 
     it_behaves_like('retrieves varz record') do
@@ -234,12 +147,12 @@ describe AdminUI::Admin, :type => :integration do
     context 'current_statistics' do
       let(:retrieved) { get_json('/current_statistics') }
       it 'retrieves' do
-        expect(retrieved).to include('apps'              => cc_started_apps['resources'].length,
+        expect(retrieved).to include('apps'              => cc_apps['resources'].length,
                                      'deas'              => 1,
                                      'organizations'     => cc_organizations['resources'].length,
-                                     'running_instances' => cc_started_apps['resources'].length,
+                                     'running_instances' => cc_apps['resources'].length,
                                      'spaces'            => cc_spaces['resources'].length,
-                                     'total_instances'   => cc_started_apps['resources'].length,
+                                     'total_instances'   => cc_apps['resources'].length,
                                      'users'             => uaa_users['resources'].length)
       end
     end
@@ -308,11 +221,6 @@ describe AdminUI::Admin, :type => :integration do
       let(:varz_name) { nats_router['host'] }
       let(:path)      { '/routers' }
       let(:varz_uri)  { nats_router_varz }
-    end
-
-    it_behaves_like('retrieves cc entity/metadata record') do
-      let(:path)      { '/routes' }
-      let(:cc_source) { cc_routes }
     end
 
     it_behaves_like('retrieves cc entity/metadata record') do

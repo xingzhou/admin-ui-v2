@@ -107,18 +107,6 @@ module AdminUI
     end
 
     def schedule_discovery
-      cache = discover_nats
-
-      @logger.debug('Caching VARZ data...')
-
-      @semaphore.synchronize do
-        @cache = cache
-        @condition.broadcast
-        @condition.wait(@semaphore, @config.varz_discovery_interval)
-      end
-    end
-
-    def discover_nats
       item_hash = {}
       cache = { 'connected' => false, 'items' => item_hash }
 
@@ -137,14 +125,20 @@ module AdminUI
         @logger.debug(error.backtrace.join("\n"))
       end
 
-      cache
+      @logger.debug('Caching VARZ data...')
+
+      @semaphore.synchronize do
+        @cache = cache
+        @condition.broadcast
+        @condition.wait(@semaphore, @config.varz_discovery_interval)
+      end
     end
 
     def item_result(uri, item)
       result = { 'uri' => uri, 'name' => item['host'] }
 
       begin
-        response = Utils.http_request(@config, uri, 'GET', (item.nil? ? nil : item['credentials']))
+        response = Utils.http_get(@config, uri, (item.nil? ? nil : item['credentials']))
 
         if response.is_a?(Net::HTTPOK)
           result.merge!('connected' => true,

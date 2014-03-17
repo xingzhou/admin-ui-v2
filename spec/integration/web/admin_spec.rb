@@ -30,7 +30,6 @@ describe AdminUI::Admin, :type => :integration, :firefox_available => true do
       expect(@driver.find_element(:id => 'HealthManagers').displayed?).to   be_true
       expect(@driver.find_element(:id => 'Gateways').displayed?).to         be_true
       expect(@driver.find_element(:id => 'Routers').displayed?).to          be_true
-      expect(@driver.find_element(:id => 'Routes').displayed?).to           be_true
       expect(@driver.find_element(:id => 'Components').displayed?).to       be_true
       expect(@driver.find_element(:id => 'Logs').displayed?).to             be_true
       expect(@driver.find_element(:id => 'Tasks').displayed?).to            be_true
@@ -50,8 +49,7 @@ describe AdminUI::Admin, :type => :integration, :firefox_available => true do
       before do
         @driver.find_element(:id => tab_id).click
         Selenium::WebDriver::Wait.new(:timeout => 5).until { @driver.find_element(:class_name => 'menuItemSelected').attribute('id') == tab_id }
-        # Enforce that the page is displayed
-        Selenium::WebDriver::Wait.new(:timeout => 5).until { @driver.find_element(:id => "#{ tab_id }Page").displayed? }
+        expect(@driver.find_element(:id => "#{ tab_id }Page").displayed?).to be_true
       end
 
       context 'Organizations' do
@@ -78,19 +76,19 @@ describe AdminUI::Admin, :type => :integration, :firefox_available => true do
                              @driver.execute_script("return Format.formatDateString(\"#{ cc_organizations['resources'][0]['metadata']['created_at'] }\")"),
                              cc_spaces['resources'].length.to_s,
                              cc_users_deep['resources'].length.to_s,
-                             cc_started_apps['resources'][0]['entity']['instances'].to_s,
+                             cc_apps['resources'][0]['entity']['instances'].to_s,
                              varz_dea['instance_registry']['application1']['application1_instance1']['services'].length.to_s,
                              @driver.execute_script("return Utilities.convertBytesToMega(#{ varz_dea['instance_registry']['application1']['application1_instance1']['used_memory_in_bytes'] })").to_s,
                              @driver.execute_script("return Utilities.convertBytesToMega(#{ varz_dea['instance_registry']['application1']['application1_instance1']['used_disk_in_bytes'] })").to_s,
                              @driver.execute_script("return Format.formatNumber(#{ varz_dea['instance_registry']['application1']['application1_instance1']['computed_pcpu'] * 100 })").to_s,
-                             cc_started_apps['resources'][0]['entity']['memory'].to_s,
-                             cc_started_apps['resources'][0]['entity']['disk_quota'].to_s,
-                             cc_started_apps['resources'].length.to_s,
-                             cc_started_apps['resources'][0]['entity']['state'] == 'STARTED' ? '1' : '0',
-                             cc_started_apps['resources'][0]['entity']['state'] == 'STOPPED' ? '1' : '0',
-                             cc_started_apps['resources'][0]['entity']['package_state'] == 'PENDING' ? '1' : '0',
-                             cc_started_apps['resources'][0]['entity']['package_state'] == 'STAGED'  ? '1' : '0',
-                             cc_started_apps['resources'][0]['entity']['package_state'] == 'FAILED'  ? '1' : '0'
+                             cc_apps['resources'][0]['entity']['memory'].to_s,
+                             cc_apps['resources'][0]['entity']['disk_quota'].to_s,
+                             cc_apps['resources'].length.to_s,
+                             cc_apps['resources'][0]['entity']['state'] == 'STARTED' ? '1' : '0',
+                             cc_apps['resources'][0]['entity']['state'] == 'STOPPED' ? '1' : '0',
+                             cc_apps['resources'][0]['entity']['package_state'] == 'PENDING' ? '1' : '0',
+                             cc_apps['resources'][0]['entity']['package_state'] == 'STAGED'  ? '1' : '0',
+                             cc_apps['resources'][0]['entity']['package_state'] == 'FAILED'  ? '1' : '0'
                            ])
         end
         context 'selectable' do
@@ -105,20 +103,19 @@ describe AdminUI::Admin, :type => :integration, :firefox_available => true do
                             { :label => 'Billing Enabled', :tag =>   nil, :value => cc_organizations['resources'][0]['entity']['billing_enabled'].to_s },
                             { :label => 'Spaces',          :tag =>   'a', :value => cc_spaces['resources'].length.to_s },
                             { :label => 'Developers',      :tag =>   'a', :value => cc_users_deep['resources'].length.to_s },
-                            { :label => 'Instances Used',  :tag =>   'a', :value => cc_started_apps['resources'][0]['entity']['instances'].to_s },
+                            { :label => 'Instances Used',  :tag =>   'a', :value => cc_apps['resources'][0]['entity']['instances'].to_s },
                             { :label => 'Services Used',   :tag =>   'a', :value => varz_dea['instance_registry']['application1']['application1_instance1']['services'].length.to_s },
                             { :label => 'Memory Used',     :tag =>   nil, :value => @driver.execute_script("return Utilities.convertBytesToMega(#{ varz_dea['instance_registry']['application1']['application1_instance1']['used_memory_in_bytes'] })").to_s },
                             { :label => 'Disk Used',       :tag =>   nil, :value => @driver.execute_script("return Utilities.convertBytesToMega(#{ varz_dea['instance_registry']['application1']['application1_instance1']['used_disk_in_bytes'] })").to_s },
                             { :label => 'CPU Used',        :tag =>   nil, :value => @driver.execute_script("return Format.formatNumber(#{ varz_dea['instance_registry']['application1']['application1_instance1']['computed_pcpu'] * 100 })").to_s },
-                            { :label => 'Memory Reserved', :tag =>   nil, :value => cc_started_apps['resources'][0]['entity']['memory'].to_s },
-                            { :label => 'Disk Reserved',   :tag =>   nil, :value => cc_started_apps['resources'][0]['entity']['disk_quota'].to_s },
-                            { :label => 'Total Apps',      :tag =>   'a', :value => cc_started_apps['resources'].length.to_s },
-                            { :label => 'Started Apps',    :tag =>   nil, :value => cc_started_apps['resources'][0]['entity']['state'] == 'STARTED' ? '1' : '0' },
-                            { :label => 'Stopped Apps',    :tag =>   nil, :value => cc_started_apps['resources'][0]['entity']['state'] == 'STOPPED' ? '1' : '0' },
-                            { :label => 'Pending Apps',    :tag =>   nil, :value => cc_started_apps['resources'][0]['entity']['package_state'] == 'PENDING' ? '1' : '0' },
-                            { :label => 'Staged Apps',     :tag =>   nil, :value => cc_started_apps['resources'][0]['entity']['package_state'] == 'STAGED'  ? '1' : '0' },
-                            { :label => 'Failed Apps',     :tag =>   nil, :value => cc_started_apps['resources'][0]['entity']['package_state'] == 'FAILED'  ? '1' : '0' },
-                            { :label => 'Routes',          :tag =>   'a', :value => cc_routes['resources'].length.to_s }
+                            { :label => 'Memory Reserved', :tag =>   nil, :value => cc_apps['resources'][0]['entity']['memory'].to_s },
+                            { :label => 'Disk Reserved',   :tag =>   nil, :value => cc_apps['resources'][0]['entity']['disk_quota'].to_s },
+                            { :label => 'Total Apps',      :tag =>   'a', :value => cc_apps['resources'].length.to_s },
+                            { :label => 'Started Apps',    :tag =>   nil, :value => cc_apps['resources'][0]['entity']['state'] == 'STARTED' ? '1' : '0' },
+                            { :label => 'Stopped Apps',    :tag =>   nil, :value => cc_apps['resources'][0]['entity']['state'] == 'STOPPED' ? '1' : '0' },
+                            { :label => 'Pending Apps',    :tag =>   nil, :value => cc_apps['resources'][0]['entity']['package_state'] == 'PENDING' ? '1' : '0' },
+                            { :label => 'Staged Apps',     :tag =>   nil, :value => cc_apps['resources'][0]['entity']['package_state'] == 'STAGED'  ? '1' : '0' },
+                            { :label => 'Failed Apps',     :tag =>   nil, :value => cc_apps['resources'][0]['entity']['package_state'] == 'FAILED'  ? '1' : '0' }
                           ])
           end
           it 'has spaces link' do
@@ -135,9 +132,6 @@ describe AdminUI::Admin, :type => :integration, :firefox_available => true do
           end
           it 'has applications link' do
             check_filter_link('Organizations', 13, 'Applications', "#{ cc_organizations['resources'][0]['entity']['name'] }/")
-          end
-          it 'has routes link' do
-            check_filter_link('Organizations', 19, 'Routes', "#{ cc_organizations['resources'][0]['entity']['name'] }/")
           end
         end
       end
@@ -165,19 +159,19 @@ describe AdminUI::Admin, :type => :integration, :firefox_available => true do
                              "#{ cc_organizations['resources'][0]['entity']['name'] }/#{ cc_spaces['resources'][0]['entity']['name'] }",
                              @driver.execute_script("return Format.formatDateString(\"#{ cc_spaces['resources'][0]['metadata']['created_at'] }\")"),
                              cc_users_deep['resources'].length.to_s,
-                             cc_started_apps['resources'][0]['entity']['instances'].to_s,
+                             cc_apps['resources'][0]['entity']['instances'].to_s,
                              varz_dea['instance_registry']['application1']['application1_instance1']['services'].length.to_s,
                              @driver.execute_script("return Utilities.convertBytesToMega(#{ varz_dea['instance_registry']['application1']['application1_instance1']['used_memory_in_bytes'] })").to_s,
                              @driver.execute_script("return Utilities.convertBytesToMega(#{ varz_dea['instance_registry']['application1']['application1_instance1']['used_disk_in_bytes'] })").to_s,
                              @driver.execute_script("return Format.formatNumber(#{ varz_dea['instance_registry']['application1']['application1_instance1']['computed_pcpu'] * 100 })").to_s,
-                             cc_started_apps['resources'][0]['entity']['memory'].to_s,
-                             cc_started_apps['resources'][0]['entity']['disk_quota'].to_s,
-                             cc_started_apps['resources'].length.to_s,
-                             cc_started_apps['resources'][0]['entity']['state'] == 'STARTED' ? '1' : '0',
-                             cc_started_apps['resources'][0]['entity']['state'] == 'STOPPED' ? '1' : '0',
-                             cc_started_apps['resources'][0]['entity']['package_state'] == 'PENDING' ? '1' : '0',
-                             cc_started_apps['resources'][0]['entity']['package_state'] == 'STAGED'  ? '1' : '0',
-                             cc_started_apps['resources'][0]['entity']['package_state'] == 'FAILED'  ? '1' : '0'
+                             cc_apps['resources'][0]['entity']['memory'].to_s,
+                             cc_apps['resources'][0]['entity']['disk_quota'].to_s,
+                             cc_apps['resources'].length.to_s,
+                             cc_apps['resources'][0]['entity']['state'] == 'STARTED' ? '1' : '0',
+                             cc_apps['resources'][0]['entity']['state'] == 'STOPPED' ? '1' : '0',
+                             cc_apps['resources'][0]['entity']['package_state'] == 'PENDING' ? '1' : '0',
+                             cc_apps['resources'][0]['entity']['package_state'] == 'STAGED'  ? '1' : '0',
+                             cc_apps['resources'][0]['entity']['package_state'] == 'FAILED'  ? '1' : '0'
                            ])
         end
         context 'selectable' do
@@ -190,20 +184,19 @@ describe AdminUI::Admin, :type => :integration, :firefox_available => true do
                             { :label => 'Organization',    :tag =>   'a', :value => cc_organizations['resources'][0]['entity']['name'] },
                             { :label => 'Created',         :tag =>   nil, :value => @driver.execute_script("return Format.formatDateString(\"#{ cc_spaces['resources'][0]['metadata']['created_at'] }\")") },
                             { :label => 'Developers',      :tag =>   'a', :value => cc_users_deep['resources'].length.to_s },
-                            { :label => 'Instances Used',  :tag =>   'a', :value => cc_started_apps['resources'][0]['entity']['instances'].to_s },
+                            { :label => 'Instances Used',  :tag =>   'a', :value => cc_apps['resources'][0]['entity']['instances'].to_s },
                             { :label => 'Services Used',   :tag =>   'a', :value => varz_dea['instance_registry']['application1']['application1_instance1']['services'].length.to_s },
                             { :label => 'Memory Used',     :tag =>   nil, :value => @driver.execute_script("return Utilities.convertBytesToMega(#{ varz_dea['instance_registry']['application1']['application1_instance1']['used_memory_in_bytes'] })").to_s },
                             { :label => 'Disk Used',       :tag =>   nil, :value => @driver.execute_script("return Utilities.convertBytesToMega(#{ varz_dea['instance_registry']['application1']['application1_instance1']['used_disk_in_bytes'] })").to_s },
                             { :label => 'CPU Used',        :tag =>   nil, :value => @driver.execute_script("return Format.formatNumber(#{ varz_dea['instance_registry']['application1']['application1_instance1']['computed_pcpu'] * 100 })").to_s },
-                            { :label => 'Memory Reserved', :tag =>   nil, :value => cc_started_apps['resources'][0]['entity']['memory'].to_s },
-                            { :label => 'Disk Reserved',   :tag =>   nil, :value => cc_started_apps['resources'][0]['entity']['disk_quota'].to_s },
-                            { :label => 'Total Apps',      :tag =>   'a', :value => cc_started_apps['resources'].length.to_s },
-                            { :label => 'Started Apps',    :tag =>   nil, :value => cc_started_apps['resources'][0]['entity']['state'] == 'STARTED' ? '1' : '0' },
-                            { :label => 'Stopped Apps',    :tag =>   nil, :value => cc_started_apps['resources'][0]['entity']['state'] == 'STOPPED' ? '1' : '0' },
-                            { :label => 'Pending Apps',    :tag =>   nil, :value => cc_started_apps['resources'][0]['entity']['package_state'] == 'PENDING' ? '1' : '0' },
-                            { :label => 'Staged Apps',     :tag =>   nil, :value => cc_started_apps['resources'][0]['entity']['package_state'] == 'STAGED'  ? '1' : '0' },
-                            { :label => 'Failed Apps',     :tag =>   nil, :value => cc_started_apps['resources'][0]['entity']['package_state'] == 'FAILED'  ? '1' : '0' },
-                            { :label => 'Routes',          :tag =>   'a', :value => cc_routes['resources'].length.to_s }
+                            { :label => 'Memory Reserved', :tag =>   nil, :value => cc_apps['resources'][0]['entity']['memory'].to_s },
+                            { :label => 'Disk Reserved',   :tag =>   nil, :value => cc_apps['resources'][0]['entity']['disk_quota'].to_s },
+                            { :label => 'Total Apps',      :tag =>   'a', :value => cc_apps['resources'].length.to_s },
+                            { :label => 'Started Apps',    :tag =>   nil, :value => cc_apps['resources'][0]['entity']['state'] == 'STARTED' ? '1' : '0' },
+                            { :label => 'Stopped Apps',    :tag =>   nil, :value => cc_apps['resources'][0]['entity']['state'] == 'STOPPED' ? '1' : '0' },
+                            { :label => 'Pending Apps',    :tag =>   nil, :value => cc_apps['resources'][0]['entity']['package_state'] == 'PENDING' ? '1' : '0' },
+                            { :label => 'Staged Apps',     :tag =>   nil, :value => cc_apps['resources'][0]['entity']['package_state'] == 'STAGED'  ? '1' : '0' },
+                            { :label => 'Failed Apps',     :tag =>   nil, :value => cc_apps['resources'][0]['entity']['package_state'] == 'FAILED'  ? '1' : '0' }
                           ])
           end
           it 'has organization link' do
@@ -221,9 +214,6 @@ describe AdminUI::Admin, :type => :integration, :firefox_available => true do
           it 'has applications link' do
             check_filter_link('Spaces', 11, 'Applications', "#{ cc_organizations['resources'][0]['entity']['name'] }/#{ cc_spaces['resources'][0]['entity']['name'] }")
           end
-          it 'has routes link' do
-            check_filter_link('Spaces', 17, 'Routes', "#{ cc_organizations['resources'][0]['entity']['name'] }/#{ cc_spaces['resources'][0]['entity']['name'] }")
-          end
         end
       end
 
@@ -235,127 +225,33 @@ describe AdminUI::Admin, :type => :integration, :firefox_available => true do
                                  :columns         => @driver.find_elements(:xpath => "//div[@id='ApplicationsTableContainer']/div/div[5]/div[1]/div/table/thead/tr[1]/th"),
                                  :expected_length => 4,
                                  :labels          => ['', 'Used', 'Reserved', ''],
-                                 :colspans        => %w(8 4 2 2)
+                                 :colspans        => %w(7 4 2 2)
                                },
                                {
                                  :columns         => @driver.find_elements(:xpath => "//div[@id='ApplicationsTableContainer']/div/div[5]/div[1]/div/table/thead/tr[2]/th"),
-                                 :expected_length => 16,
-                                 :labels          => ['', 'Name', 'State', "Package\nState", 'Started', 'URI', 'Buildpack', 'Instance', 'Services', 'Memory', 'Disk', '% CPU', 'Memory', 'Disk', 'Target', 'DEA'],
+                                 :expected_length => 15,
+                                 :labels          => ['Name', 'State', "Package\nState", 'Started', 'URI', 'Buildpack', 'Instance', 'Services', 'Memory', 'Disk', '% CPU', 'Memory', 'Disk', 'Target', 'DEA'],
                                  :colspans        => nil
                                }
                              ])
           check_table_data(@driver.find_elements(:xpath => "//table[@id='ApplicationsTable']/tbody/tr/td"),
                            [
-                             '',
-                             cc_started_apps['resources'][0]['entity']['name'],
-                             cc_started_apps['resources'][0]['entity']['state'],
+                             cc_apps['resources'][0]['entity']['name'],
+                             cc_apps['resources'][0]['entity']['state'],
                              @driver.execute_script('return Constants.STATUS__STAGED'),
                              @driver.execute_script("return Format.formatDateNumber(#{ (varz_dea['instance_registry']['application1']['application1_instance1']['state_running_timestamp'] * 1000) })"),
                              "http://#{ varz_dea['instance_registry']['application1']['application1_instance1']['application_uris'][0] }",
-                             cc_started_apps['resources'][0]['entity']['detected_buildpack'],
+                             cc_apps['resources'][0]['entity']['detected_buildpack'],
                              varz_dea['instance_registry']['application1']['application1_instance1']['instance_index'].to_s,
                              varz_dea['instance_registry']['application1']['application1_instance1']['services'].length.to_s,
                              @driver.execute_script("return Utilities.convertBytesToMega(#{ varz_dea['instance_registry']['application1']['application1_instance1']['used_memory_in_bytes'] })").to_s,
                              @driver.execute_script("return Utilities.convertBytesToMega(#{ varz_dea['instance_registry']['application1']['application1_instance1']['used_disk_in_bytes'] })").to_s,
                              @driver.execute_script("return Format.formatNumber(#{ varz_dea['instance_registry']['application1']['application1_instance1']['computed_pcpu'] * 100 })").to_s,
-                             cc_started_apps['resources'][0]['entity']['memory'].to_s,
-                             cc_started_apps['resources'][0]['entity']['disk_quota'].to_s,
+                             cc_apps['resources'][0]['entity']['memory'].to_s,
+                             cc_apps['resources'][0]['entity']['disk_quota'].to_s,
                              "#{ cc_organizations['resources'][0]['entity']['name'] }/#{ cc_spaces['resources'][0]['entity']['name'] }",
                              nats_dea['host']
                            ])
-        end
-        it 'has a checkbox in the first column' do
-          inputs = @driver.find_elements(:xpath => "//table[@id='ApplicationsTable']/tbody/tr/td[1]/input")
-          expect(inputs.length).to eq(1)
-          expect(inputs[0].attribute('value')).to eq("#{ cc_organizations['resources'][0]['entity']['name'] }/#{ cc_spaces['resources'][0]['entity']['name'] }/#{ cc_started_apps['resources'][0]['entity']['name'] }")
-        end
-        context 'manage application' do
-
-          def manage_application(buttonIndex)
-            check_first_row
-            @driver.find_element(:id => 'ToolTables_ApplicationsTable_' + buttonIndex.to_s).click
-            check_operation_result
-          end
-
-          def check_first_row
-            @driver.find_elements(:xpath => "//table[@id='ApplicationsTable']/tbody/tr/td[1]/input")[0].click
-          end
-
-          def check_app_state(expect_state)
-            # As the UI table will be refreshed and recreated, add a try-catch block in case the selenium stale element
-            # error happens. Do not use expect in the block body...
-            Selenium::WebDriver::Wait.new(:timeout => 5).until do
-              begin
-                @driver.find_element(:xpath => "//table[@id='ApplicationsTable']/tbody/tr/td[3]").text == expect_state
-              rescue
-                expect(@driver.find_element(:xpath => "//table[@id='ApplicationsTable']/tbody/tr/td[3]").text).to eq(expect_state)
-              end
-            end
-          end
-
-          def check_operation_result
-            alert = nil
-            Selenium::WebDriver::Wait.new(:timeout => 5).until { !(alert = @driver.switch_to.alert).nil? }
-            expect(alert.text).to eq("The operation finished without error.\nPlease refresh the page later for the updated result.")
-            alert.dismiss
-          end
-
-          it 'has a start button' do
-            expect(@driver.find_element(:id => 'ToolTables_ApplicationsTable_0').text).to eq('Start')
-          end
-
-          it 'has a stop button' do
-            expect(@driver.find_element(:id => 'ToolTables_ApplicationsTable_1').text).to eq('Stop')
-          end
-
-          it 'has a restart button' do
-            expect(@driver.find_element(:id => 'ToolTables_ApplicationsTable_2').text).to eq('Restart')
-          end
-
-          shared_examples 'click start button without selecting a single row' do
-            it 'alerts the user to select at least one row when clicking the button' do
-              @driver.find_element(:id => buttonId).click
-              alert = @driver.switch_to.alert
-              expect(alert.text).to eq('Please select at least one row!')
-              alert.dismiss
-            end
-          end
-
-          # Start button
-          it_behaves_like('click start button without selecting a single row') do
-            let(:buttonId) { 'ToolTables_ApplicationsTable_0' }
-          end
-          # Stop button
-          it_behaves_like('click start button without selecting a single row') do
-            let(:buttonId) { 'ToolTables_ApplicationsTable_1' }
-          end
-          # Restart button
-          it_behaves_like('click start button without selecting a single row') do
-            let(:buttonId) { 'ToolTables_ApplicationsTable_2' }
-          end
-
-          it 'stops the selected application' do
-            cc_stopped_apps_stub(AdminUI::Config.load(config))
-
-            # stop the app
-            manage_application(1)
-            check_app_state('STOPPED')
-          end
-          it 'starts the selected application' do
-            # let app in stopped state first
-            cc_apps_stop_to_start_stub(AdminUI::Config.load(config))
-            manage_application(1)
-            check_app_state('STOPPED')
-
-            # start the app
-            manage_application(0)
-            check_app_state('STARTED')
-          end
-          it 'restart the selected application' do
-            # restart the app
-            manage_application(2)
-            check_app_state('STARTED')
-          end
         end
         context 'selectable' do
           before do
@@ -363,12 +259,12 @@ describe AdminUI::Admin, :type => :integration, :firefox_available => true do
           end
           it 'has details' do
             check_details([
-                            { :label => 'Name',            :tag => 'div', :value => cc_started_apps['resources'][0]['entity']['name'] },
-                            { :label => 'State',           :tag =>   nil, :value => cc_started_apps['resources'][0]['entity']['state'] },
-                            { :label => 'Package State',   :tag =>   nil, :value => cc_started_apps['resources'][0]['entity']['package_state'] },
+                            { :label => 'Name',            :tag => 'div', :value => cc_apps['resources'][0]['entity']['name'] },
+                            { :label => 'State',           :tag =>   nil, :value => cc_apps['resources'][0]['entity']['state'] },
+                            { :label => 'Package State',   :tag =>   nil, :value => cc_apps['resources'][0]['entity']['package_state'] },
                             { :label => 'Started',         :tag =>   nil, :value => @driver.execute_script("return Format.formatDateNumber(#{ (varz_dea['instance_registry']['application1']['application1_instance1']['state_running_timestamp'] * 1000) })") },
                             { :label => 'URI',             :tag =>   'a', :value => "http://#{ varz_dea['instance_registry']['application1']['application1_instance1']['application_uris'][0] }" },
-                            { :label => 'Buildpack',       :tag =>   nil, :value => cc_started_apps['resources'][0]['entity']['detected_buildpack'] },
+                            { :label => 'Buildpack',       :tag =>   nil, :value => cc_apps['resources'][0]['entity']['detected_buildpack'] },
                             { :label => 'Instance Index',  :tag =>   nil, :value => varz_dea['instance_registry']['application1']['application1_instance1']['instance_index'].to_s },
                             { :label => 'Instance State',  :tag =>   nil, :value => varz_dea['instance_registry']['application1']['application1_instance1']['state'] },
                             { :label => 'Droplet Hash',    :tag =>   nil, :value => varz_dea['instance_registry']['application1']['application1_instance1']['droplet_sha1'].to_s },
@@ -376,8 +272,8 @@ describe AdminUI::Admin, :type => :integration, :firefox_available => true do
                             { :label => 'Memory Used',     :tag =>   nil, :value => @driver.execute_script("return Utilities.convertBytesToMega(#{ varz_dea['instance_registry']['application1']['application1_instance1']['used_memory_in_bytes'] })").to_s },
                             { :label => 'Disk Used',       :tag =>   nil, :value => @driver.execute_script("return Utilities.convertBytesToMega(#{ varz_dea['instance_registry']['application1']['application1_instance1']['used_disk_in_bytes'] })").to_s },
                             { :label => 'CPU Used',        :tag =>   nil, :value => @driver.execute_script("return Format.formatNumber(#{ varz_dea['instance_registry']['application1']['application1_instance1']['computed_pcpu'] * 100 })").to_s },
-                            { :label => 'Memory Reserved', :tag =>   nil, :value => cc_started_apps['resources'][0]['entity']['memory'].to_s },
-                            { :label => 'Disk Reserved',   :tag =>   nil, :value => cc_started_apps['resources'][0]['entity']['disk_quota'].to_s },
+                            { :label => 'Memory Reserved', :tag =>   nil, :value => cc_apps['resources'][0]['entity']['memory'].to_s },
+                            { :label => 'Disk Reserved',   :tag =>   nil, :value => cc_apps['resources'][0]['entity']['disk_quota'].to_s },
                             { :label => 'Space',           :tag =>   'a', :value => cc_spaces['resources'][0]['entity']['name'] },
                             { :label => 'Organization',    :tag =>   'a', :value => cc_organizations['resources'][0]['entity']['name'] },
                             { :label => 'DEA',             :tag =>   'a', :value => nats_dea['host'] }
@@ -406,105 +302,6 @@ describe AdminUI::Admin, :type => :integration, :firefox_available => true do
           end
           it 'has DEA link' do
             check_select_link('Applications', 17, 'DEAs', nats_dea['host'])
-          end
-        end
-      end
-
-      context 'Routes' do
-        let(:tab_id) { 'Routes' }
-        it 'has a table' do
-          check_table_layout([
-                               {
-                                 :columns         => @driver.find_elements(:xpath => "//div[@id='RoutesTableContainer']/div/div[5]/div[1]/div/table/thead/tr[1]/th"),
-                                 :expected_length => 6,
-                                 :labels          => ['', 'Host', 'Domain', 'Created', 'Target', 'Application'],
-                                 :colspans        => nil
-                               }
-                             ])
-
-          app_names = []
-          cc_routes['resources'][0]['entity']['apps'].each do |app|
-            app_names.push(app['entity']['name'])
-          end
-
-          check_table_data(@driver.find_elements(:xpath => "//table[@id='RoutesTable']/tbody/tr/td"),
-                           [
-                             '',
-                             cc_routes['resources'][0]['entity']['host'],
-                             cc_routes['resources'][0]['entity']['domain']['entity']['name'],
-                             @driver.execute_script("return Format.formatDateString(\"#{ cc_routes['resources'][0]['metadata']['created_at'] }\")"),
-                             "#{ cc_organizations['resources'][0]['entity']['name'] }/#{ cc_spaces['resources'][0]['entity']['name'] }",
-                             app_names.join(',')
-                           ])
-        end
-
-        it 'has a checkbox in the first column' do
-          inputs = @driver.find_elements(:xpath => "//table[@id='RoutesTable']/tbody/tr/td[1]/input")
-          expect(inputs.length).to eq(1)
-          expect(inputs[0].attribute('value')).to eq("#{ cc_routes['resources'][0]['entity']['host'] }.#{ cc_routes['resources'][0]['entity']['domain']['entity']['name'] }")
-        end
-
-        context 'manage routes' do
-          def check_first_row
-            @driver.find_elements(:xpath => "//table[@id='RoutesTable']/tbody/tr/td[1]/input")[0].click
-          end
-
-          it 'has a delete button' do
-            expect(@driver.find_element(:id => 'ToolTables_RoutesTable_0').text).to eq('Delete')
-          end
-
-          it 'alerts the user to select at least one row when clicking the delete button' do
-            @driver.find_element(:id => 'ToolTables_RoutesTable_0').click
-            alert = @driver.switch_to.alert
-            expect(alert.text).to eq('Please select at least one row!')
-            alert.dismiss
-          end
-
-          it 'deletes the selected route' do
-            cc_empty_routes_stub(AdminUI::Config.load(config))
-
-            # delete the route
-            check_first_row
-            @driver.find_element(:id => 'ToolTables_RoutesTable_0').click
-            confirm = @driver.switch_to.alert
-            expect(confirm.text).to eq('Are you sure you want to delete the selected routes?')
-            confirm.accept
-
-            alert = nil
-            Selenium::WebDriver::Wait.new(:timeout => 5).until { !(alert = @driver.switch_to.alert).nil? }
-            expect(alert.text).to eq('Routes successfully deleted.')
-            alert.dismiss
-
-            begin
-              Selenium::WebDriver::Wait.new(:timeout => 5).until { @driver.find_element(:xpath => "//table[@id='RoutesTable']/tbody/tr").text == 'No data available in table' }
-            rescue
-              expect(@driver.find_element(:xpath => "//table[@id='RoutesTable']/tbody/tr").text).to eq('No data available in table')
-            end
-          end
-        end
-
-        context 'selectable' do
-          before do
-            select_first_row
-          end
-          it 'has details' do
-            check_details([
-                            { :label => 'Host',          :tag => nil, :value => cc_routes['resources'][0]['entity']['host'] },
-                            { :label => 'Domain',        :tag => nil, :value => cc_routes['resources'][0]['entity']['domain']['entity']['name'] },
-                            { :label => 'Applications',  :tag => 'a', :value => cc_routes['resources'][0]['entity']['apps'].length.to_s },
-                            { :label => 'Space',         :tag => 'a', :value => cc_spaces['resources'][0]['entity']['name'] },
-                            { :label => 'Organization',  :tag => 'a', :value => cc_organizations['resources'][0]['entity']['name'] },
-                            { :label => 'Created',       :tag => nil, :value => @driver.execute_script("return Format.formatDateString(\"#{ cc_routes['resources'][0]['metadata']['created_at'] }\")") }
-                          ])
-          end
-          it 'has applications link' do
-            check_filter_link('Routes', 2, 'Applications', "#{ cc_routes['resources'][0]['entity']['host'] }.#{ cc_routes['resources'][0]['entity']['domain']['entity']['name'] }")
-          end
-          it 'has space link' do
-            check_select_link('Routes', 3, 'Spaces', "#{ cc_spaces['resources'][0]['entity']['name'] }")
-          end
-          it 'has organization link' do
-            check_select_link('Routes', 4, 'Organizations', "#{ cc_organizations['resources'][0]['entity']['name'] }")
           end
         end
       end
@@ -578,7 +375,7 @@ describe AdminUI::Admin, :type => :integration, :firefox_available => true do
                                 :colspans        => nil)
             check_table_data(@driver.find_elements(:xpath => "//table[@id='ServiceInstancesApplicationsTable']/tbody/tr/td"),
                              [
-                               cc_started_apps['resources'][0]['entity']['name'],
+                               cc_apps['resources'][0]['entity']['name'],
                                @driver.execute_script("return Format.formatDateString(\"#{ cc_service_bindings['resources'][0]['metadata']['created_at'] }\")")
                              ])
           end
@@ -1033,12 +830,7 @@ describe AdminUI::Admin, :type => :integration, :firefox_available => true do
           @driver.find_element(:id => 'ToolTables_StatsTable_0').click
           date = @driver.find_element(:xpath => "//span[@id='DialogText']/span").text
           @driver.find_element(:id => 'DialogOkayButton').click
-          begin
-            Selenium::WebDriver::Wait.new(:timeout => 5).until { @driver.find_element(:xpath => "//table[@id='StatsTable']/tbody/tr").text != 'No data available in table' }
-          rescue
-            expect(@driver.find_element(:xpath => "//table[@id='StatsTable']/tbody/tr").text).should_not eq('No data available in table')
-          end
-
+          Selenium::WebDriver::Wait.new(:timeout => 5).until { @driver.find_element(:xpath => "//table[@id='StatsTable']/tbody/tr").text != 'No data available in table' }
           check_table_data(@driver.find_elements(:xpath => "//table[@id='StatsTable']/tbody/tr/td"), [date, '1', '1', '1', '1', '1', '1', '1'])
         end
       end
