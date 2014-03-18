@@ -14,7 +14,7 @@ shared_context :web_context do
   let(:stat_count) { 1 }
 
   before do
-    @driver = get_selenium_web_driver
+    @driver = Selenium::WebDriver.for(:firefox)
     @driver.manage.timeouts.implicit_wait = 5
   end
 

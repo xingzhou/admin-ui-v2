@@ -2,10 +2,9 @@ language: ruby
 rvm:
   - 1.9.3-p484
 
-addons:
-  sauce_connect:
-    username: "xingzhou-github"
-    access_key: "b4d226f4-9ac2-4fcb-a1ab-8b10e042ef98"
+before_install:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
 
 script: bundle exec rspec spec
 
