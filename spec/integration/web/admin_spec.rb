@@ -16,7 +16,8 @@ describe AdminUI::Admin, :type => :integration, :firefox_available => true do
     end
 
     it 'has a title' do
-      expect(@driver.find_element(:class => 'cloudControllerText').text).to eq(cloud_controller_uri)
+      Selenium::WebDriver::Wait.new(:timeout => 5).until { @driver.find_element(:class => 'cloudControllerText').text == cloud_controller_uri }
+      #expect(@driver.find_element(:class => 'cloudControllerText').text).to eq(cloud_controller_uri)
     end
 
     it 'has tabs' do
