@@ -793,10 +793,25 @@ describe AdminUI::Admin, :type => :integration, :firefox_available => true do
           @driver.find_element(:id => 'ToolTables_DEAsTable_0').click
           @driver.find_element(:id => 'DialogOkayButton').click
           @driver.find_element(:id => 'Tasks').click
-          expect(@driver.find_elements(:xpath => "//table[@id='TasksTable']/tbody/tr").length).to eq(1)
-          cells = @driver.find_elements(:xpath => "//table[@id='TasksTable']/tbody/tr/td")
-          expect(cells[0].text).to eq(File.join(File.dirname(__FILE__)[0..-22], 'lib/admin/scripts', 'newDEA.sh'))
-          expect(cells[1].text).to eq(@driver.execute_script('return Constants.STATUS__RUNNING'))
+
+          begin
+            Selenium::WebDriver::Wait.new(:timeout => 5).until { @driver.find_elements(:xpath => "//table[@id='TasksTable']/tbody/tr").length == 1 }
+          rescue
+            expect(@driver.find_elements(:xpath => "//table[@id='TasksTable']/tbody/tr").length).to eq(1)
+          end
+
+          begin
+            Selenium::WebDriver::Wait.new(:timeout => 5).until {
+              cells = @driver.find_elements(:xpath => "//table[@id='TasksTable']/tbody/tr/td")
+              cells[0].text == File.join(File.dirname(__FILE__)[0..-22], 'lib/admin/scripts', 'newDEA.sh') &&
+              cells[1].text == @driver.execute_script('return Constants.STATUS__RUNNING')
+            }
+          rescue
+            cells = @driver.find_elements(:xpath => "//table[@id='TasksTable']/tbody/tr/td")
+            expect(cells[0].text).to eq(File.join(File.dirname(__FILE__)[0..-22], 'lib/admin/scripts', 'newDEA.sh'))
+            expect(cells[1].text).to eq(@driver.execute_script('return Constants.STATUS__RUNNING'))
+          end
+
           @driver.find_elements(:xpath => "//table[@id='TasksTable']/tbody/tr")[0].click
           expect(@driver.find_element(:id => 'TaskContents').text.length > 0).to be_true
         end
