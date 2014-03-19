@@ -49,9 +49,12 @@ describe AdminUI::Admin, :type => :integration, :firefox_available => true do
     context 'tabs' do
       before do
 
-        Selenium::WebDriver::Wait.new(:timeout => 10).until { puts '*******' + @driver.find_element(:class_name => 'menuItemSelected').attribute('id') + '/' + tab_id;@driver.find_element(:id => tab_id).click;@driver.find_element(:class_name => 'menuItemSelected').attribute('id') == tab_id }
+        Selenium::WebDriver::Wait.new(:timeout => 5).until {
+          @driver.find_element(:id => tab_id).click
+          @driver.find_element(:class_name => 'menuItemSelected').attribute('id') == tab_id
+        }
         # Enforce that the page is displayed
-        Selenium::WebDriver::Wait.new(:timeout => 10).until { @driver.find_element(:id => "#{ tab_id }Page").displayed? }
+        Selenium::WebDriver::Wait.new(:timeout => 5).until { @driver.find_element(:id => "#{ tab_id }Page").displayed? }
       end
 
       context 'Organizations' do
