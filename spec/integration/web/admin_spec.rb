@@ -16,8 +16,8 @@ describe AdminUI::Admin, :type => :integration, :firefox_available => true do
     end
 
     it 'has a title' do
+      # Need to wait until the page has been rendered
       Selenium::WebDriver::Wait.new(:timeout => 5).until { @driver.find_element(:class => 'cloudControllerText').text == cloud_controller_uri }
-      #expect(@driver.find_element(:class => 'cloudControllerText').text).to eq(cloud_controller_uri)
     end
 
     it 'has tabs' do
@@ -48,12 +48,13 @@ describe AdminUI::Admin, :type => :integration, :firefox_available => true do
 
     context 'tabs' do
       before do
-
-        Selenium::WebDriver::Wait.new(:timeout => 5).until {
+        # Move click action into the wait blog to ensure relevant tab has been clicked and rendered
+        # This part is modified to fit Travis CI system.
+        Selenium::WebDriver::Wait.new(:timeout => 5).until do
           @driver.find_element(:id => tab_id).click
           @driver.find_element(:class_name => 'menuItemSelected').attribute('id') == tab_id
-        }
-        # Enforce that the page is displayed
+        end
+        # Need to wait until the page has been rendered
         Selenium::WebDriver::Wait.new(:timeout => 5).until { @driver.find_element(:id => "#{ tab_id }Page").displayed? }
       end
 
@@ -797,22 +798,25 @@ describe AdminUI::Admin, :type => :integration, :firefox_available => true do
           @driver.find_element(:id => 'DialogOkayButton').click
           @driver.find_element(:id => 'Tasks').click
 
-          begin
-            Selenium::WebDriver::Wait.new(:timeout => 5).until { @driver.find_elements(:xpath => "//table[@id='TasksTable']/tbody/tr").length == 1 }
-          rescue
-            expect(@driver.find_elements(:xpath => "//table[@id='TasksTable']/tbody/tr").length).to eq(1)
+          # As the page refreshes, we need to catch the stale element error and re-find the element on the page
+          Selenium::WebDriver::Wait.new(:timeout => 5).until do
+            begin
+              @driver.find_elements(:xpath => "//table[@id='TasksTable']/tbody/tr").length == 1
+            rescue ExceptionType = Selenium::WebDriver::Error::StaleElementReferenceError
+              expect(@driver.find_elements(:xpath => "//table[@id='TasksTable']/tbody/tr").length).to eq(1)
+            end
           end
 
-          begin
-            Selenium::WebDriver::Wait.new(:timeout => 5).until {
+          Selenium::WebDriver::Wait.new(:timeout => 5).until do
+            begin
               cells = @driver.find_elements(:xpath => "//table[@id='TasksTable']/tbody/tr/td")
               cells[0].text == File.join(File.dirname(__FILE__)[0..-22], 'lib/admin/scripts', 'newDEA.sh') &&
               cells[1].text == @driver.execute_script('return Constants.STATUS__RUNNING')
-            }
-          rescue
-            cells = @driver.find_elements(:xpath => "//table[@id='TasksTable']/tbody/tr/td")
-            expect(cells[0].text).to eq(File.join(File.dirname(__FILE__)[0..-22], 'lib/admin/scripts', 'newDEA.sh'))
-            expect(cells[1].text).to eq(@driver.execute_script('return Constants.STATUS__RUNNING'))
+            rescue ExceptionType = Selenium::WebDriver::Error::StaleElementReferenceError
+              cells = @driver.find_elements(:xpath => "//table[@id='TasksTable']/tbody/tr/td")
+              expect(cells[0].text).to eq(File.join(File.dirname(__FILE__)[0..-22], 'lib/admin/scripts', 'newDEA.sh'))
+              expect(cells[1].text).to eq(@driver.execute_script('return Constants.STATUS__RUNNING'))
+            end
           end
 
           @driver.find_elements(:xpath => "//table[@id='TasksTable']/tbody/tr")[0].click
@@ -850,10 +854,14 @@ describe AdminUI::Admin, :type => :integration, :firefox_available => true do
           @driver.find_element(:id => 'ToolTables_StatsTable_0').click
           date = @driver.find_element(:xpath => "//span[@id='DialogText']/span").text
           @driver.find_element(:id => 'DialogOkayButton').click
-          begin
-            Selenium::WebDriver::Wait.new(:timeout => 5).until { @driver.find_element(:xpath => "//table[@id='StatsTable']/tbody/tr").text != 'No data available in table' }
-          rescue
-              expect(@driver.find_element(:xpath => "//table[@id='StatsTable']/tbody/tr").text).should_not eq('No data available in table')
+
+          # As the page refreshes, we need to catch the stale element error and re-find the element on the page
+          Selenium::WebDriver::Wait.new(:timeout => 5).until do
+            begin
+              @driver.find_element(:xpath => "//table[@id='StatsTable']/tbody/tr").text != 'No data available in table'
+            rescue ExceptionType = Selenium::WebDriver::Error::StaleElementReferenceError
+                expect(@driver.find_element(:xpath => "//table[@id='StatsTable']/tbody/tr").text).should_not eq('No data available in table')
+            end
           end
           check_table_data(@driver.find_elements(:xpath => "//table[@id='StatsTable']/tbody/tr/td"), [date, '1', '1', '1', '1', '1', '1', '1'])
         end
