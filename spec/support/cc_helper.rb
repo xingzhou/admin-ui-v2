@@ -24,7 +24,7 @@ module CCHelper
     end
 
     AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/apps", AdminUI::Utils::HTTP_GET, anything, anything, anything) do
-      OK.new(cc_apps)
+      OK.new(cc_started_apps)
     end
 
     AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/organizations", AdminUI::Utils::HTTP_GET, anything, anything, anything) do
@@ -60,31 +60,16 @@ module CCHelper
     end
   end
 
-  def cc_apps
-    {
-      'total_results' => 1,
-      'resources'     =>
-      [
-        {
-          'metadata' =>
-          {
-            'created_at' => '2013-10-18T08:28:35-05:00',
-            'guid'       => 'application1'
-          },
-          'entity'   =>
-          {
-            'detected_buildpack' => 'Ruby/Rack',
-            'disk_quota'         => 12,
-            'instances'          => 1,
-            'memory'             => 11,
-            'name'               => 'test',
-            'package_state'      => 'STAGED',
-            'space_guid'         => 'space1',
-            'state'              => 'STARTED'
-          }
-        }
-      ]
-    }
+  def cc_apps_start_to_stop_stub(config)
+    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/apps", AdminUI::Utils::HTTP_GET, anything, anything, anything).and_return(CCHelper::OK.new(cc_started_apps), CCHelper::OK.new(cc_stopped_apps))
+  end
+
+  def cc_apps_stop_to_start_stub(config)
+    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/apps", AdminUI::Utils::HTTP_GET, anything, anything, anything).and_return(CCHelper::OK.new(cc_stopped_apps), CCHelper::OK.new(cc_started_apps))
+  end
+
+  def cc_stopped_apps_stub(config)
+    AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/apps", AdminUI::Utils::HTTP_GET, anything, anything, anything).and_return(CCHelper::OK.new(cc_stopped_apps))
   end
 
   def cc_organizations
@@ -225,6 +210,102 @@ module CCHelper
           }
         }
       ]
+    }
+  end
+
+  def cc_started_app
+    {
+        'metadata' =>
+            {
+                'created_at' => '2013-10-18T08:28:35-05:00',
+                'guid'       => 'application1'
+            },
+        'entity'   =>
+            {
+                'detected_buildpack' => 'Ruby/Rack',
+                'disk_quota'         => 12,
+                'instances'          => 1,
+                'memory'             => 11,
+                'name'               => 'test',
+                'package_state'      => 'STAGED',
+                'space_guid'         => 'space1',
+                'state'              => 'STARTED'
+            }
+    }
+  end
+
+  def cc_stopped_app
+    {
+        'metadata' =>
+            {
+                'created_at' => '2013-10-18T08:28:35-05:00',
+                'guid'       => 'application1'
+            },
+        'entity'   =>
+            {
+                'detected_buildpack' => 'Ruby/Rack',
+                'disk_quota'         => 12,
+                'instances'          => 1,
+                'memory'             => 11,
+                'name'               => 'test',
+                'package_state'      => 'STAGED',
+                'space_guid'         => 'space1',
+                'state'              => 'STOPPED'
+            }
+    }
+  end
+
+  def cc_started_apps
+    {
+        'total_results' => 1,
+        'resources'     =>
+            [
+                {
+                    'metadata' =>
+                        {
+                            'created_at' => '2013-10-18T08:28:35-05:00',
+                            'guid'       => 'application1'
+                        },
+                    'entity'   =>
+                        {
+                            'detected_buildpack' => 'Ruby/Rack',
+                            'disk_quota'         => 12,
+                            'instances'          => 1,
+                            'memory'             => 11,
+                            'name'               => 'test',
+                            'package_state'      => 'STAGED',
+                            'space_guid'         => 'space1',
+                            'state'              => 'STARTED'
+                        }
+                }
+            ]
+    }
+  end
+
+  def cc_stopped_apps
+    {
+        'total_results' => 1,
+        'resources'     =>
+            [
+                {
+                    'metadata' =>
+                        {
+                            'created_at' => '2013-10-18T08:28:35-05:00',
+                            'guid'       => 'application1'
+                        },
+                    'entity'   =>
+                        {
+                            'detected_buildpack' => 'Ruby/Rack',
+                            'disk_quota'         => 12,
+                            'instances'          => 1,
+                            'memory'             => 11,
+                            'name'               => 'test',
+                            'package_state'      => 'STAGED',
+                            'space_guid'         => 'space1',
+                            'state'              => 'STOPPED'
+                        }
+                }
+            ]
     }
   end
 
