@@ -11,14 +11,16 @@ describe AdminUI::Operation, :type => :integration do
   let(:log_file) { '/tmp/admin_ui.log' }
   let(:logger) { Logger.new(log_file) }
   let(:config) do
-    AdminUI::Config.load(:cloud_controller_discovery_interval => 10,
-    :cloud_controller_uri                => 'http://api.cloudfoundry',
-    :data_file                           => data_file,
-    :monitored_components                => [],
-    :uaa_admin_credentials               => { :username => 'user', :password => 'password' })
+    AdminUI::Config.load(
+      :cloud_controller_discovery_interval => 10,
+      :cloud_controller_uri                => 'http://api.cloudfoundry',
+      :data_file                           => data_file,
+      :monitored_components                => [],
+      :uaa_admin_credentials               => { :username => 'user', :password => 'password' }
+    )
   end
 
-  let(:client) { AdminUI::RestClient.new(config, logger) }
+  let(:client) { AdminUI::CCRestClient.new(config, logger) }
 
   before do
     AdminUI::Config.any_instance.stub(:validate)
@@ -46,17 +48,17 @@ describe AdminUI::Operation, :type => :integration do
       end
 
       it 'stops the running application' do
-        # Stub the http request to return stopped application
+        # Mock the http request to return stopped application
         cc_stopped_apps_stub(config)
-        expect { operation.manage_application('application1', '{"state":"STOPPED"}') }.to change{ cc.applications['items'][0]['state'] }.from('STARTED').to('STOPPED')
+        expect { operation.manage_application('application1', '{"state":"STOPPED"}') }.to change { cc.applications['items'][0]['state'] }.from('STARTED').to('STOPPED')
       end
 
       it 'starts the stopped application' do
-        # Stub the http request to return stopped application
+        # Make sure the application is stopped at first.
         cc_apps_stop_to_start_stub(config)
         operation.manage_application('application1', '{"state":"STOPPED"}')
 
-        expect { operation.manage_application('application1', '{"state":"STARTED"}') }.to change{ cc.applications['items'][0]['state'] }.from('STOPPED').to('STARTED')
+        expect { operation.manage_application('application1', '{"state":"STARTED"}') }.to change { cc.applications['items'][0]['state'] }.from('STOPPED').to('STARTED')
       end
     end
   end

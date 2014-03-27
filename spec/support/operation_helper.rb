@@ -10,7 +10,7 @@ module OperationHelper
     def initialize(hash)
       super(1.0, 201, 'OK')
       @body = hash.to_json
-      end
+    end
   end
 
   def operation_stub(config)
@@ -20,6 +20,6 @@ module OperationHelper
 
     AdminUI::Utils.stub(:http_request).with(anything, "#{ config.cloud_controller_uri }/v2/apps/application1", AdminUI::Utils::HTTP_PUT, anything, '{"state":"STARTED"}', anything) do
       Created.new(cc_started_app)
-      end
+    end
   end
 end
